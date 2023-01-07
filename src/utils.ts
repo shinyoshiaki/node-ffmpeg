@@ -1,8 +1,11 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var exec = require('child_process').exec;
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var isWindows = require('os').platform().match(/win(32|64)/);
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var which = require('which');
 
 var nlRegexp = /\r\n|\r|\n/g;
@@ -17,7 +20,7 @@ var whichCache = {};
  * @return progress object
  * @private
  */
-function parseProgressLine(line) {
+function parseProgressLine(line: any) {
   var progress = {};
 
   // Remove all spaces after = and trim
@@ -34,6 +37,7 @@ function parseProgressLine(line) {
     if(typeof value === 'undefined')
       return null;
 
+    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     progress[key] = value;
   }
 
@@ -41,6 +45,7 @@ function parseProgressLine(line) {
 }
 
 
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 var utils = module.exports = {
   isWindows: isWindows,
   streamRegexp: streamRegexp,
@@ -53,7 +58,7 @@ var utils = module.exports = {
    * @param {Object} dest destination object
    * @private
    */
-  copy: function(source, dest) {
+  copy: function(source: any, dest: any) {
     Object.keys(source).forEach(function(key) {
       dest[key] = source[key];
     });
@@ -73,7 +78,7 @@ var utils = module.exports = {
    * @private
    */
   args: function() {
-    var list = [];
+    var list: any = [];
 
     // Append argument(s) to the list
     var argfunc = function() {
@@ -85,17 +90,20 @@ var utils = module.exports = {
     };
 
     // Clear argument list
+    // @ts-expect-error TS(2339): Property 'clear' does not exist on type '() => voi... Remove this comment to see the full error message
     argfunc.clear = function() {
       list = [];
     };
 
     // Return argument list
+    // @ts-expect-error TS(2339): Property 'get' does not exist on type '() => void'... Remove this comment to see the full error message
     argfunc.get = function() {
       return list;
     };
 
     // Find argument 'arg' in list, and if found, return an array of the 'count' items that follow it
-    argfunc.find = function(arg, count) {
+    // @ts-expect-error TS(2339): Property 'find' does not exist on type '() => void... Remove this comment to see the full error message
+    argfunc.find = function(arg: any, count: any) {
       var index = list.indexOf(arg);
       if (index !== -1) {
         return list.slice(index + 1, index + 1 + (count || 0));
@@ -103,7 +111,8 @@ var utils = module.exports = {
     };
 
     // Find argument 'arg' in list, and if found, remove it as well as the 'count' items that follow it
-    argfunc.remove = function(arg, count) {
+    // @ts-expect-error TS(2339): Property 'remove' does not exist on type '() => vo... Remove this comment to see the full error message
+    argfunc.remove = function(arg: any, count: any) {
       var index = list.indexOf(arg);
       if (index !== -1) {
         list.splice(index, (count || 0) + 1);
@@ -111,6 +120,7 @@ var utils = module.exports = {
     };
 
     // Clone argument list
+    // @ts-expect-error TS(2339): Property 'clone' does not exist on type '() => voi... Remove this comment to see the full error message
     argfunc.clone = function() {
       var cloned = utils.args();
       cloned(list);
@@ -135,8 +145,8 @@ var utils = module.exports = {
    * @return String[]
    * @private
    */
-  makeFilterStrings: function(filters) {
-    return filters.map(function(filterSpec) {
+  makeFilterStrings: function(filters: any) {
+    return filters.map(function(filterSpec: any) {
       if (typeof filterSpec === 'string') {
         return filterSpec;
       }
@@ -151,7 +161,7 @@ var utils = module.exports = {
 
       // Add inputs
       if (Array.isArray(filterSpec.inputs)) {
-        filterString += filterSpec.inputs.map(function(streamSpec) {
+        filterString += filterSpec.inputs.map(function(streamSpec: any) {
           return streamSpec.replace(streamRegexp, '[$1]');
         }).join('');
       } else if (typeof filterSpec.inputs === 'string') {
@@ -168,7 +178,7 @@ var utils = module.exports = {
           filterString += '=' + filterSpec.options;
         } else if (Array.isArray(filterSpec.options)) {
           // Option array (unnamed options)
-          filterString += '=' + filterSpec.options.map(function(option) {
+          filterString += '=' + filterSpec.options.map(function(option: any) {
             if (typeof option === 'string' && option.match(filterEscapeRegexp)) {
               return '\'' + option + '\'';
             } else {
@@ -191,7 +201,7 @@ var utils = module.exports = {
 
       // Add outputs
       if (Array.isArray(filterSpec.outputs)) {
-        filterString += filterSpec.outputs.map(function(streamSpec) {
+        filterString += filterSpec.outputs.map(function(streamSpec: any) {
           return streamSpec.replace(streamRegexp, '[$1]');
         }).join('');
       } else if (typeof filterSpec.outputs === 'string') {
@@ -212,16 +222,19 @@ var utils = module.exports = {
    * @param {Function} callback callback with signature (err, path)
    * @private
    */
-  which: function(name, callback) {
+  which: function(name: any, callback: any) {
     if (name in whichCache) {
+      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       return callback(null, whichCache[name]);
     }
 
-    which(name, function(err, result){
+    which(name, function(err: any, result: any){
       if (err) {
         // Treat errors as not found
+        // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         return callback(null, whichCache[name] = '');
       }
+      // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       callback(null, whichCache[name] = result);
     });
   },
@@ -234,7 +247,7 @@ var utils = module.exports = {
    * @return Number
    * @private
    */
-  timemarkToSeconds: function(timemark) {
+  timemarkToSeconds: function(timemark: any) {
     if (typeof timemark === 'number') {
       return timemark;
     }
@@ -272,7 +285,7 @@ var utils = module.exports = {
    * @return {Boolean} true if codec data is complete (and event was emitted), false otherwise
    * @private
    */
-  extractCodecData: function(command, stderrLine, codecsObject) {
+  extractCodecData: function(command: any, stderrLine: any, codecsObject: any) {
     var inputPattern = /Input #[0-9]+, ([^ ]+),/;
     var durPattern = /Duration\: ([^,]+)/;
     var audioPattern = /Audio\: (.*)/;
@@ -323,16 +336,21 @@ var utils = module.exports = {
    * @param {String} stderrLine ffmpeg stderr data
    * @private
    */
-  extractProgress: function(command, stderrLine) {
+  extractProgress: function(command: any, stderrLine: any) {
     var progress = parseProgressLine(stderrLine);
 
     if (progress) {
       // build progress report object
       var ret = {
+        // @ts-expect-error TS(2339): Property 'frame' does not exist on type '{}'.
         frames: parseInt(progress.frame, 10),
+        // @ts-expect-error TS(2339): Property 'fps' does not exist on type '{}'.
         currentFps: parseInt(progress.fps, 10),
+        // @ts-expect-error TS(2339): Property 'bitrate' does not exist on type '{}'.
         currentKbps: progress.bitrate ? parseFloat(progress.bitrate.replace('kbits/s', '')) : 0,
+        // @ts-expect-error TS(2339): Property 'size' does not exist on type '{}'.
         targetSize: parseInt(progress.size || progress.Lsize, 10),
+        // @ts-expect-error TS(2339): Property 'time' does not exist on type '{}'.
         timemark: progress.time
       };
 
@@ -340,6 +358,7 @@ var utils = module.exports = {
       if (command._ffprobeData && command._ffprobeData.format && command._ffprobeData.format.duration) {
         var duration = Number(command._ffprobeData.format.duration);
         if (!isNaN(duration))
+          // @ts-expect-error TS(2339): Property 'percent' does not exist on type '{ frame... Remove this comment to see the full error message
           ret.percent = (utils.timemarkToSeconds(ret.timemark) / duration) * 100;
       }
       command.emit('progress', ret);
@@ -354,9 +373,9 @@ var utils = module.exports = {
    * @return {String}
    * @private
    */
-  extractError: function(stderr) {
+  extractError: function(stderr: any) {
     // Only return the last stderr lines that don't start with a space or a square bracket
-    return stderr.split(nlRegexp).reduce(function(messages, message) {
+    return stderr.split(nlRegexp).reduce(function(messages: any, message: any) {
       if (message.charAt(0) === ' ' || message.charAt(0) === '[') {
         return [];
       } else {
@@ -376,25 +395,28 @@ var utils = module.exports = {
    *
    * @param {Numebr} maxLines maximum number of lines to store (<= 0 for unlimited)
    */
-  linesRing: function(maxLines) {
-    var cbs = [];
-    var lines = [];
-    var current = null;
+  linesRing: function(maxLines: any) {
+    var cbs: any = [];
+    var lines: any = [];
+    var current: any = null;
     var closed = false
     var max = maxLines - 1;
 
-    function emit(line) {
+    function emit(line: any) {
+      // @ts-expect-error TS(7006): Parameter 'cb' implicitly has an 'any' type.
       cbs.forEach(function(cb) { cb(line); });
     }
 
     return {
-      callback: function(cb) {
+      callback: function(cb: any) {
+        // @ts-expect-error TS(7006): Parameter 'l' implicitly has an 'any' type.
         lines.forEach(function(l) { cb(l); });
         cbs.push(cb);
       },
 
-      append: function(str) {
+      append: function(str: any) {
         if (closed) return;
+        // @ts-expect-error TS(2580): Cannot find name 'Buffer'. Do you need to install ... Remove this comment to see the full error message
         if (str instanceof Buffer) str = '' + str;
         if (!str || str.length === 0) return;
 
@@ -415,7 +437,7 @@ var utils = module.exports = {
 
           current = newLines.pop();
 
-          newLines.forEach(function(l) {
+          newLines.forEach(function(l: any) {
             emit(l);
             lines.push(l);
           });

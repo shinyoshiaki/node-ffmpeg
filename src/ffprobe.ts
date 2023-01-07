@@ -1,16 +1,17 @@
 /*jshint node:true, laxcomma:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var spawn = require('child_process').spawn;
 
 
-function legacyTag(key) { return key.match(/^TAG:/); }
-function legacyDisposition(key) { return key.match(/^DISPOSITION:/); }
+function legacyTag(key: any) { return key.match(/^TAG:/); }
+function legacyDisposition(key: any) { return key.match(/^DISPOSITION:/); }
 
-function parseFfprobeOutput(out) {
+function parseFfprobeOutput(out: any) {
   var lines = out.split(/\r\n|\r|\n/);
 
-  lines = lines.filter(function (line) {
+  lines = lines.filter(function (line: any) {
     return line.length > 0;
   });
 
@@ -20,7 +21,7 @@ function parseFfprobeOutput(out) {
     chapters: []
   };
 
-  function parseBlock(name) {
+  function parseBlock(name: any) {
     var data = {};
 
     var line = lines.shift();
@@ -35,8 +36,10 @@ function parseFfprobeOutput(out) {
       var kv = line.match(/^([^=]+)=(.*)$/);
       if (kv) {
         if (!(kv[1].match(/^TAG:/)) && kv[2].match(/^[0-9]+(\.[0-9]+)?$/)) {
+          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           data[kv[1]] = Number(kv[2]);
         } else {
+          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           data[kv[1]] = kv[2];
         }
       }
@@ -51,9 +54,11 @@ function parseFfprobeOutput(out) {
   while (typeof line !== 'undefined') {
     if (line.match(/^\[stream/i)) {
       var stream = parseBlock('stream');
+      // @ts-expect-error TS(2345): Argument of type '{}' is not assignable to paramet... Remove this comment to see the full error message
       data.streams.push(stream);
     } else if (line.match(/^\[chapter/i)) {
       var chapter = parseBlock('chapter');
+      // @ts-expect-error TS(2345): Argument of type '{}' is not assignable to paramet... Remove this comment to see the full error message
       data.chapters.push(chapter);
     } else if (line.toLowerCase() === '[format]') {
       data.format = parseBlock('format');
@@ -67,7 +72,8 @@ function parseFfprobeOutput(out) {
 
 
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * A callback passed to the {@link FfmpegCommand#ffprobe} method.
    *
@@ -94,13 +100,13 @@ module.exports = function(proto) {
    *
    */
   proto.ffprobe = function() {
-    var input, index = null, options = [], callback;
+    var input: any, index = null, options: any = [], callback: any;
 
     // the last argument should be the callback
     var callback = arguments[arguments.length - 1];
 
     var ended = false
-    function handleCallback(err, data) {
+    function handleCallback(err: any, data: any) {
       if (!ended) {
         ended = true;
         callback(err, data);
@@ -125,6 +131,7 @@ module.exports = function(proto) {
 
     if (index === null) {
       if (!this._currentInput) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error('No input specified'));
       }
 
@@ -133,15 +140,18 @@ module.exports = function(proto) {
       input = this._inputs[index];
 
       if (!input) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error('Invalid input index'));
       }
     }
 
     // Find ffprobe
-    this._getFfprobePath(function(err, path) {
+    this._getFfprobePath(function(err: any, path: any) {
       if (err) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(err);
       } else if (!path) {
+        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error('Cannot find ffprobe'));
       }
 
@@ -157,8 +167,9 @@ module.exports = function(proto) {
       if (input.isStream) {
         // Skip errors on stdin. These get thrown when ffprobe is complete and
         // there seems to be no way hook in and close stdin before it throws.
-        ffprobe.stdin.on('error', function(err) {
+        ffprobe.stdin.on('error', function(err: any) {
           if (['ECONNRESET', 'EPIPE', 'EOF'].indexOf(err.code) >= 0) { return; }
+          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           handleCallback(err);
         });
 
@@ -175,8 +186,8 @@ module.exports = function(proto) {
       ffprobe.on('error', callback);
 
       // Ensure we wait for captured streams to end before calling callback
-      var exitError = null;
-      function handleExit(err) {
+      var exitError: any = null;
+      function handleExit(err: any) {
         if (err) {
           exitError = err;
         }
@@ -187,6 +198,7 @@ module.exports = function(proto) {
               exitError.message += '\n' + stderr;
             }
 
+            // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
             return handleCallback(exitError);
           }
 
@@ -199,10 +211,13 @@ module.exports = function(proto) {
               var legacyTagKeys = Object.keys(target).filter(legacyTag);
 
               if (legacyTagKeys.length) {
+                // @ts-expect-error TS(2339): Property 'tags' does not exist on type '{}'.
                 target.tags = target.tags || {};
 
                 legacyTagKeys.forEach(function(tagKey) {
+                  // @ts-expect-error TS(2339): Property 'tags' does not exist on type '{}'.
                   target.tags[tagKey.substr(4)] = target[tagKey];
+                  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                   delete target[tagKey];
                 });
               }
@@ -210,10 +225,13 @@ module.exports = function(proto) {
               var legacyDispositionKeys = Object.keys(target).filter(legacyDisposition);
 
               if (legacyDispositionKeys.length) {
+                // @ts-expect-error TS(2339): Property 'disposition' does not exist on type '{}'... Remove this comment to see the full error message
                 target.disposition = target.disposition || {};
 
                 legacyDispositionKeys.forEach(function(dispositionKey) {
+                  // @ts-expect-error TS(2339): Property 'disposition' does not exist on type '{}'... Remove this comment to see the full error message
                   target.disposition[dispositionKey.substr(12)] = target[dispositionKey];
+                  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                   delete target[dispositionKey];
                 });
               }
@@ -226,7 +244,7 @@ module.exports = function(proto) {
 
       // Handle ffprobe exit
       var processExited = false;
-      ffprobe.on('exit', function(code, signal) {
+      ffprobe.on('exit', function(code: any, signal: any) {
         processExited = true;
 
         if (code) {
@@ -234,26 +252,29 @@ module.exports = function(proto) {
         } else if (signal) {
           handleExit(new Error('ffprobe was killed with signal ' + signal));
         } else {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           handleExit();
         }
       });
 
       // Handle stdout/stderr streams
-      ffprobe.stdout.on('data', function(data) {
+      ffprobe.stdout.on('data', function(data: any) {
         stdout += data;
       });
 
       ffprobe.stdout.on('close', function() {
         stdoutClosed = true;
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
 
-      ffprobe.stderr.on('data', function(data) {
+      ffprobe.stderr.on('data', function(data: any) {
         stderr += data;
       });
 
       ffprobe.stderr.on('close', function() {
         stderrClosed = true;
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
     });

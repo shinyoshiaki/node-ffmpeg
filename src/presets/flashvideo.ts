@@ -1,7 +1,8 @@
 /*jshint node:true */
 'use strict';
 
-exports.load = function(ffmpeg) {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.load = function(ffmpeg: any) {
   ffmpeg
     .format('flv')
     .flvmeta()

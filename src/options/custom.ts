@@ -1,6 +1,7 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('../utils');
 
 
@@ -8,7 +9,8 @@ var utils = require('../utils');
  *! Custom options methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Add custom input option(s)
    *
@@ -38,7 +40,7 @@ module.exports = function(proto) {
   proto.withInputOption =
   proto.withInputOptions =
   proto.inputOption =
-  proto.inputOptions = function(options) {
+  proto.inputOptions = function(options: any) {
     if (!this._currentInput) {
       throw new Error('No input specified');
     }
@@ -54,7 +56,7 @@ module.exports = function(proto) {
       options = [options];
     }
 
-    this._currentInput.options(options.reduce(function(options, option) {
+    this._currentInput.options(options.reduce(function(options: any, option: any) {
       var split = String(option).split(' ');
 
       if (doSplit && split.length === 2) {
@@ -97,7 +99,7 @@ module.exports = function(proto) {
   proto.withOption =
   proto.withOptions =
   proto.outputOption =
-  proto.outputOptions = function(options) {
+  proto.outputOptions = function(options: any) {
     var doSplit = true;
 
     if (arguments.length > 1) {
@@ -109,7 +111,7 @@ module.exports = function(proto) {
       options = [options];
     }
 
-    this._currentOutput.options(options.reduce(function(options, option) {
+    this._currentOutput.options(options.reduce(function(options: any, option: any) {
       var split = String(option).split(' ');
 
       if (doSplit && split.length === 2) {
@@ -189,7 +191,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.filterGraph =
-  proto.complexFilter = function(spec, map) {
+  proto.complexFilter = function(spec: any, map: any) {
     this._complexFilters.clear();
 
     if (!Array.isArray(spec)) {

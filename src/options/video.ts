@@ -1,6 +1,7 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('../utils');
 
 
@@ -8,7 +9,8 @@ var utils = require('../utils');
  *! Video-related methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Disable video in the output
    *
@@ -39,7 +41,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withVideoCodec =
-  proto.videoCodec = function(codec) {
+  proto.videoCodec = function(codec: any) {
     this._currentOutput.video('-vcodec', codec);
     return this;
   };
@@ -57,7 +59,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withVideoBitrate =
-  proto.videoBitrate = function(bitrate, constant) {
+  proto.videoBitrate = function(bitrate: any, constant: any) {
     bitrate = ('' + bitrate).replace(/k?$/, 'k');
 
     this._currentOutput.video('-b:v', bitrate);
@@ -123,7 +125,7 @@ module.exports = function(proto) {
   proto.withVideoFilter =
   proto.withVideoFilters =
   proto.videoFilter =
-  proto.videoFilters = function(filters) {
+  proto.videoFilters = function(filters: any) {
     if (arguments.length > 1) {
       filters = [].slice.call(arguments);
     }
@@ -159,7 +161,7 @@ module.exports = function(proto) {
   proto.fpsOutput =
   proto.FPSOutput =
   proto.fps =
-  proto.FPS = function(fps) {
+  proto.FPS = function(fps: any) {
     this._currentOutput.video('-r', fps);
     return this;
   };
@@ -177,7 +179,7 @@ module.exports = function(proto) {
    */
   proto.takeFrames =
   proto.withFrames =
-  proto.frames = function(frames) {
+  proto.frames = function(frames: any) {
     this._currentOutput.video('-vframes', frames);
     return this;
   };

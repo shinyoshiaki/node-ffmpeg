@@ -1,6 +1,7 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('../utils');
 
 
@@ -8,7 +9,8 @@ var utils = require('../utils');
  *! Output-related methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Add output
    *
@@ -21,7 +23,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.addOutput =
-  proto.output = function(target, pipeopts) {
+  proto.output = function(target: any, pipeopts: any) {
     var isFile = false;
 
     if (!target && this._currentOutput) {
@@ -45,7 +47,7 @@ module.exports = function(proto) {
       this._currentOutput.pipeopts = pipeopts || {};
     } else {
       if (target && typeof target !== 'string') {
-        var hasOutputStream = this._outputs.some(function(output) {
+        var hasOutputStream = this._outputs.some(function(output: any) {
           return typeof output.target !== 'string';
         });
 
@@ -87,7 +89,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.seekOutput =
-  proto.seek = function(seek) {
+  proto.seek = function(seek: any) {
     this._currentOutput.options('-ss', seek);
     return this;
   };
@@ -105,7 +107,7 @@ module.exports = function(proto) {
    */
   proto.withDuration =
   proto.setDuration =
-  proto.duration = function(duration) {
+  proto.duration = function(duration: any) {
     this._currentOutput.options('-t', duration);
     return this;
   };
@@ -124,7 +126,7 @@ module.exports = function(proto) {
   proto.toFormat =
   proto.withOutputFormat =
   proto.outputFormat =
-  proto.format = function(format) {
+  proto.format = function(format: any) {
     this._currentOutput.options('-f', format);
     return this;
   };
@@ -139,7 +141,7 @@ module.exports = function(proto) {
    * @param {String} spec stream specification string, with optional square brackets
    * @return FfmpegCommand
    */
-  proto.map = function(spec) {
+  proto.map = function(spec: any) {
     this._currentOutput.options('-map', spec.replace(utils.streamRegexp, '[$1]'));
     return this;
   };

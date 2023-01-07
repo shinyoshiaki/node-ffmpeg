@@ -1,6 +1,7 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('../utils');
 
 
@@ -8,7 +9,8 @@ var utils = require('../utils');
  *! Audio-related methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Disable audio in the output
    *
@@ -38,7 +40,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withAudioCodec =
-  proto.audioCodec = function(codec) {
+  proto.audioCodec = function(codec: any) {
     this._currentOutput.audio('-acodec', codec);
 
     return this;
@@ -56,7 +58,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withAudioBitrate =
-  proto.audioBitrate = function(bitrate) {
+  proto.audioBitrate = function(bitrate: any) {
     this._currentOutput.audio('-b:a', ('' + bitrate).replace(/k?$/, 'k'));
     return this;
   };
@@ -73,7 +75,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withAudioChannels =
-  proto.audioChannels = function(channels) {
+  proto.audioChannels = function(channels: any) {
     this._currentOutput.audio('-ac', channels);
     return this;
   };
@@ -90,7 +92,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withAudioFrequency =
-  proto.audioFrequency = function(freq) {
+  proto.audioFrequency = function(freq: any) {
     this._currentOutput.audio('-ar', freq);
     return this;
   };
@@ -107,7 +109,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.withAudioQuality =
-  proto.audioQuality = function(quality) {
+  proto.audioQuality = function(quality: any) {
     this._currentOutput.audio('-aq', quality);
     return this;
   };
@@ -163,7 +165,7 @@ module.exports = function(proto) {
   proto.withAudioFilter =
   proto.withAudioFilters =
   proto.audioFilter =
-  proto.audioFilters = function(filters) {
+  proto.audioFilters = function(filters: any) {
     if (arguments.length > 1) {
       filters = [].slice.call(arguments);
     }

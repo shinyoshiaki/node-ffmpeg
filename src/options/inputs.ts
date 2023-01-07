@@ -1,13 +1,15 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('../utils');
 
 /*
  *! Input-related methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Add an input to command
    *
@@ -25,7 +27,7 @@ module.exports = function(proto) {
    */
   proto.mergeAdd =
   proto.addInput =
-  proto.input = function(source) {
+  proto.input = function(source: any) {
     var isFile = false;
     var isStream = false;
 
@@ -34,7 +36,7 @@ module.exports = function(proto) {
         throw new Error('Invalid input');
       }
 
-      var hasInputStream = this._inputs.some(function(input) {
+      var hasInputStream = this._inputs.some(function(input: any) {
         return input.isStream;
       });
 
@@ -72,7 +74,7 @@ module.exports = function(proto) {
    */
   proto.withInputFormat =
   proto.inputFormat =
-  proto.fromFormat = function(format) {
+  proto.fromFormat = function(format: any) {
     if (!this._currentInput) {
       throw new Error('No input specified');
     }
@@ -100,7 +102,7 @@ module.exports = function(proto) {
   proto.inputFPS =
   proto.inputFps =
   proto.fpsInput =
-  proto.FPSInput = function(fps) {
+  proto.FPSInput = function(fps: any) {
     if (!this._currentInput) {
       throw new Error('No input specified');
     }
@@ -142,7 +144,7 @@ module.exports = function(proto) {
    * @return FfmpegCommand
    */
   proto.setStartTime =
-  proto.seekInput = function(seek) {
+  proto.seekInput = function(seek: any) {
     if (!this._currentInput) {
       throw new Error('No input specified');
     }
@@ -162,7 +164,7 @@ module.exports = function(proto) {
    * @param {String|Number} [duration] loop duration in seconds or as a '[[hh:]mm:]ss[.xxx]' string
    * @return FfmpegCommand
    */
-  proto.loop = function(duration) {
+  proto.loop = function(duration: any) {
     if (!this._currentInput) {
       throw new Error('No input specified');
     }

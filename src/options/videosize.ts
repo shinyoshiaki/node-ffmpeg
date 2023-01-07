@@ -16,7 +16,7 @@
  * @return scale/pad filters
  * @private
  */
-function getScalePadFilters(width, height, aspect, color) {
+function getScalePadFilters(width: any, height: any, aspect: any, color: any) {
   /*
     let a be the input aspect ratio, A be the requested aspect ratio
 
@@ -65,7 +65,7 @@ function getScalePadFilters(width, height, aspect, color) {
  * @return filter string array
  * @private
  */
-function createSizeFilters(output, key, value) {
+function createSizeFilters(output: any, key: any, value: any) {
   // Store parameters
   var data = output.sizeData = output.sizeData || {};
   data[key] = value;
@@ -151,7 +151,8 @@ function createSizeFilters(output, key, value) {
  *! Video size-related methods
  */
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Keep display aspect ratio
    *
@@ -205,7 +206,7 @@ module.exports = function(proto) {
    */
   proto.withSize =
   proto.setSize =
-  proto.size = function(size) {
+  proto.size = function(size: any) {
     var filters = createSizeFilters(this._currentOutput, 'size', size);
 
     this._currentOutput.sizeFilters.clear();
@@ -230,7 +231,7 @@ module.exports = function(proto) {
   proto.setAspect =
   proto.setAspectRatio =
   proto.aspect =
-  proto.aspectRatio = function(aspect) {
+  proto.aspectRatio = function(aspect: any) {
     var a = Number(aspect);
     if (isNaN(a)) {
       var match = aspect.match(/^(\d+):(\d+)$/);
@@ -269,7 +270,7 @@ module.exports = function(proto) {
   proto.withAutopad =
   proto.withAutoPad =
   proto.autoPad =
-  proto.autopad = function(pad, color) {
+  proto.autopad = function(pad: any, color: any) {
     // Allow autopad(color)
     if (typeof pad === 'string') {
       color = pad;

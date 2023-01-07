@@ -1,10 +1,15 @@
 /*jshint node:true*/
 'use strict';
 
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var spawn = require('child_process').spawn;
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var path = require('path');
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var fs = require('fs');
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var async = require('async');
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 var utils = require('./utils');
 
 /*
@@ -18,19 +23,20 @@ var utils = require('./utils');
  * @param {FfmpegCommand} command
  * @private
  */
-function runFfprobe(command) {
+function runFfprobe(command: any) {
   const inputProbeIndex = 0;
   if (command._inputs[inputProbeIndex].isStream) {
     // Don't probe input streams as this will consume them
     return;
   }
-  command.ffprobe(inputProbeIndex, function(err, data) {
+  command.ffprobe(inputProbeIndex, function(err: any, data: any) {
     command._ffprobeData = data;
   });
 }
 
 
-module.exports = function(proto) {
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+module.exports = function(proto: any) {
   /**
    * Emitted just after ffmpeg has been spawned.
    *
@@ -110,7 +116,7 @@ module.exports = function(proto) {
    * @param {Function} endCB callback called with error (if applicable) and stdout/stderr ring buffers when process finished
    * @private
    */
-  proto._spawnFfmpeg = function(args, options, processCB, endCB) {
+  proto._spawnFfmpeg = function(args: any, options: any, processCB: any, endCB: any) {
     // Enable omitting options
     if (typeof options === 'function') {
       endCB = processCB;
@@ -127,7 +133,7 @@ module.exports = function(proto) {
     var maxLines = 'stdoutLines' in options ? options.stdoutLines : this.options.stdoutLines;
 
     // Find ffmpeg
-    this._getFfmpegPath(function(err, command) {
+    this._getFfmpegPath(function(err: any, command: any) {
       if (err) {
         return endCB(err);
       } else if (!command || command.length === 0) {
@@ -153,13 +159,13 @@ module.exports = function(proto) {
         ffmpegProc.stderr.setEncoding('utf8');
       }
 
-      ffmpegProc.on('error', function(err) {
+      ffmpegProc.on('error', function(err: any) {
         endCB(err);
       });
 
       // Ensure we wait for captured streams to end before calling endCB
-      var exitError = null;
-      function handleExit(err) {
+      var exitError: any = null;
+      function handleExit(err: any) {
         if (err) {
           exitError = err;
         }
@@ -171,7 +177,7 @@ module.exports = function(proto) {
 
       // Handle process exit
       var processExited = false;
-      ffmpegProc.on('exit', function(code, signal) {
+      ffmpegProc.on('exit', function(code: any, signal: any) {
         processExited = true;
 
         if (signal) {
@@ -179,31 +185,34 @@ module.exports = function(proto) {
         } else if (code) {
           handleExit(new Error('ffmpeg exited with code ' + code));
         } else {
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           handleExit();
         }
       });
 
       // Capture stdout if specified
       if (options.captureStdout) {
-        ffmpegProc.stdout.on('data', function(data) {
+        ffmpegProc.stdout.on('data', function(data: any) {
           stdoutRing.append(data);
         });
 
         ffmpegProc.stdout.on('close', function() {
           stdoutRing.close();
           stdoutClosed = true;
+          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           handleExit();
         });
       }
 
       // Capture stderr if specified
-      ffmpegProc.stderr.on('data', function(data) {
+      ffmpegProc.stderr.on('data', function(data: any) {
         stderrRing.append(data);
       });
 
       ffmpegProc.stderr.on('close', function() {
         stderrRing.close();
         stderrClosed = true;
+        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
 
@@ -223,13 +232,13 @@ module.exports = function(proto) {
   proto._getArguments = function() {
     var complexFilters = this._complexFilters.get();
 
-    var fileOutput = this._outputs.some(function(output) {
+    var fileOutput = this._outputs.some(function(output: any) {
       return output.isFile;
     });
 
     return [].concat(
         // Inputs and input options
-        this._inputs.reduce(function(args, input) {
+        this._inputs.reduce(function(args: any, input: any) {
           var source = (typeof input.source === 'string') ? input.source : 'pipe:0';
 
           // For each input, add input options, then '-i <source>'
@@ -243,17 +252,18 @@ module.exports = function(proto) {
         this._global.get(),
 
         // Overwrite if we have file outputs
+        // @ts-expect-error TS(2769): No overload matches this call.
         fileOutput ? ['-y'] : [],
 
         // Complex filters
         complexFilters,
 
         // Outputs, filters and output options
-        this._outputs.reduce(function(args, output) {
+        this._outputs.reduce(function(args: any, output: any) {
           var sizeFilters = utils.makeFilterStrings(output.sizeFilters.get());
           var audioFilters = output.audioFilters.get();
           var videoFilters = output.videoFilters.get().concat(sizeFilters);
-          var outputArg;
+          var outputArg: any;
 
           if (!output.target) {
             outputArg = [];
@@ -287,22 +297,22 @@ module.exports = function(proto) {
    * @param {Boolean} [readMetadata=false] read metadata before processing
    * @private
    */
-  proto._prepare = function(callback, readMetadata) {
+  proto._prepare = function(callback: any, readMetadata: any) {
     var self = this;
 
     async.waterfall([
       // Check codecs and formats
-      function(cb) {
+      function(cb: any) {
         self._checkCapabilities(cb);
       },
 
       // Read metadata if required
-      function(cb) {
+      function(cb: any) {
         if (!readMetadata) {
           return cb();
         }
 
-        self.ffprobe(0, function(err, data) {
+        self.ffprobe(0, function(err: any, data: any) {
           if (!err) {
             self._ffprobeData = data;
           }
@@ -312,8 +322,8 @@ module.exports = function(proto) {
       },
 
       // Check for flvtool2/flvmeta if necessary
-      function(cb) {
-        var flvmeta = self._outputs.some(function(output) {
+      function(cb: any) {
+        var flvmeta = self._outputs.some(function(output: any) {
           // Remove flvmeta flag on non-file output
           if (output.flags.flvmeta && !output.isFile) {
             self.logger.warn('Updating flv metadata is only supported for files');
@@ -324,7 +334,7 @@ module.exports = function(proto) {
         });
 
         if (flvmeta) {
-          self._getFlvtoolPath(function(err) {
+          self._getFlvtoolPath(function(err: any) {
             cb(err);
           });
         } else {
@@ -333,7 +343,7 @@ module.exports = function(proto) {
       },
 
       // Build argument list
-      function(cb) {
+      function(cb: any) {
         var args;
         try {
           args = self._getArguments();
@@ -345,8 +355,8 @@ module.exports = function(proto) {
       },
 
       // Add "-strict experimental" option where needed
-      function(args, cb) {
-        self.availableEncoders(function(err, encoders) {
+      function(args: any, cb: any) {
+        self.availableEncoders(function(err: any, encoders: any) {
           for (var i = 0; i < args.length; i++) {
             if (args[i] === '-acodec' || args[i] === '-vcodec') {
               i++;
@@ -371,7 +381,7 @@ module.exports = function(proto) {
         runFfprobe(this);
       } else {
         // Read metadata as soon as the first 'progress' listener is added
-        this.once('newListener', function(event) {
+        this.once('newListener', function(this: any, event: any) {
           if (event === 'progress') {
             runFfprobe(this);
           }
@@ -394,7 +404,7 @@ module.exports = function(proto) {
     var self = this;
 
     // Check if at least one output is present
-    var outputPresent = this._outputs.some(function(output) {
+    var outputPresent = this._outputs.some(function(output: any) {
       return 'target' in output;
     });
 
@@ -403,18 +413,18 @@ module.exports = function(proto) {
     }
 
     // Get output stream if any
-    var outputStream = this._outputs.filter(function(output) {
+    var outputStream = this._outputs.filter(function(output: any) {
       return typeof output.target !== 'string';
     })[0];
 
     // Get input stream if any
-    var inputStream = this._inputs.filter(function(input) {
+    var inputStream = this._inputs.filter(function(input: any) {
       return typeof input.source !== 'string';
     })[0];
 
     // Ensure we send 'end' or 'error' only once
     var ended = false;
-    function emitEnd(err, stdout, stderr) {
+    function emitEnd(err: any, stdout: any, stderr: any) {
       if (!ended) {
         ended = true;
 
@@ -426,8 +436,9 @@ module.exports = function(proto) {
       }
     }
 
-    self._prepare(function(err, args) {
+    self._prepare(function(err: any, args: any) {
       if (err) {
+        // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
         return emitEnd(err);
       }
 
@@ -441,15 +452,17 @@ module.exports = function(proto) {
           windowsHide: true
         }, 
 
-        function processCB(ffmpegProc, stdoutRing, stderrRing) {
+        function processCB(ffmpegProc: any, stdoutRing: any, stderrRing: any) {
           self.ffmpegProc = ffmpegProc;
           self.emit('start', 'ffmpeg ' + args.join(' '));
 
           // Pipe input stream if any
           if (inputStream) {
-            inputStream.source.on('error', function(err) {
+            inputStream.source.on('error', function(err: any) {
               var reportingErr = new Error('Input stream error: ' + err.message);
+              // @ts-expect-error TS(2339): Property 'inputStreamError' does not exist on type... Remove this comment to see the full error message
               reportingErr.inputStreamError = err;
+              // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
               emitEnd(reportingErr);
               ffmpegProc.kill();
             });
@@ -486,14 +499,16 @@ module.exports = function(proto) {
               // under load, the process 'exit' event sometimes happens
               // after the output stream 'close' event.
               setTimeout(function() {
+                // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
                 emitEnd(new Error('Output stream closed'));
                 ffmpegProc.kill();
               }, 20);
             });
 
-            outputStream.target.on('error', function(err) {
+            outputStream.target.on('error', function(err: any) {
               self.logger.debug('Output stream error, killing ffmpeg process');
               var reportingErr = new Error('Output stream error: ' + err.message);
+              // @ts-expect-error TS(2339): Property 'outputStreamError' does not exist on typ... Remove this comment to see the full error message
               reportingErr.outputStreamError = err;
               emitEnd(reportingErr, stdoutRing.get(), stderrRing.get());
               ffmpegProc.kill('SIGKILL');
@@ -505,7 +520,7 @@ module.exports = function(proto) {
 
             // 'stderr' event
             if (self.listeners('stderr').length) {
-              stderrRing.callback(function(line) {
+              stderrRing.callback(function(line: any) {
                 self.emit('stderr', line);
               });
             }
@@ -515,7 +530,7 @@ module.exports = function(proto) {
               var codecDataSent = false;
               var codecObject = {};
 
-              stderrRing.callback(function(line) {
+              stderrRing.callback(function(line: any) {
                 if (!codecDataSent)
                   codecDataSent = utils.extractCodecData(self, line, codecObject);
               });
@@ -523,14 +538,14 @@ module.exports = function(proto) {
 
             // 'progress' event
             if (self.listeners('progress').length) {
-              stderrRing.callback(function(line) {
+              stderrRing.callback(function(line: any) {
                 utils.extractProgress(self, line);
               });
             }
           }
         },
 
-        function endCB(err, stdoutRing, stderrRing) {
+        function endCB(err: any, stdoutRing: any, stderrRing: any) {
           clearTimeout(self.processTimer);
           delete self.ffmpegProc;
 
@@ -543,24 +558,25 @@ module.exports = function(proto) {
             emitEnd(err, stdoutRing.get(), stderrRing.get());
           } else {
             // Find out which outputs need flv metadata
-            var flvmeta = self._outputs.filter(function(output) {
+            var flvmeta = self._outputs.filter(function(output: any) {
               return output.flags.flvmeta;
             });
 
             if (flvmeta.length) {
-              self._getFlvtoolPath(function(err, flvtool) {
+              self._getFlvtoolPath(function(err: any, flvtool: any) {
                 if (err) {
+                  // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
                   return emitEnd(err);
                 }
 
                 async.each(
                   flvmeta,
-                  function(output, cb) {
+                  function(output: any, cb: any) {
                     spawn(flvtool, ['-U', output.target], {windowsHide: true})
-                      .on('error', function(err) {
+                      .on('error', function(err: any) {
                         cb(new Error('Error running ' + flvtool + ' on ' + output.target + ': ' + err.message));
                       })
-                      .on('exit', function(code, signal) {
+                      .on('exit', function(code: any, signal: any) {
                         if (code !== 0 || signal) {
                           cb(
                             new Error(flvtool + ' ' +
@@ -573,8 +589,9 @@ module.exports = function(proto) {
                         }
                       });
                   },
-                  function(err) {
+                  function(err: any) {
                     if (err) {
+                      // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
                       emitEnd(err);
                     } else {
                       emitEnd(null, stdoutRing.get(), stderrRing.get());
@@ -605,7 +622,7 @@ module.exports = function(proto) {
    * @param {Number} [niceness=0] niceness value between -20 (highest priority) and 20 (lowest priority)
    * @return FfmpegCommand
    */
-  proto.renice = function(niceness) {
+  proto.renice = function(niceness: any) {
     if (!utils.isWindows) {
       niceness = niceness || 0;
 
@@ -621,11 +638,11 @@ module.exports = function(proto) {
         var pid = this.ffmpegProc.pid;
         var renice = spawn('renice', [niceness, '-p', pid], {windowsHide: true});
 
-        renice.on('error', function(err) {
+        renice.on('error', function(err: any) {
           logger.warn('could not renice process ' + pid + ': ' + err.message);
         });
 
-        renice.on('exit', function(code, signal) {
+        renice.on('exit', function(code: any, signal: any) {
           if (signal) {
             logger.warn('could not renice process ' + pid + ': renice was killed by signal ' + signal);
           } else if (code) {
@@ -650,7 +667,7 @@ module.exports = function(proto) {
    * @param {String} [signal=SIGKILL] signal name
    * @return FfmpegCommand
    */
-  proto.kill = function(signal) {
+  proto.kill = function(signal: any) {
     if (!this.ffmpegProc) {
       this.logger.warn('No running ffmpeg process, cannot send signal');
     } else {
