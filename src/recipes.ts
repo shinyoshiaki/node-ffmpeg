@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 import async from "async";
-import fs from "fs";
+import fs, { WriteStream } from "fs";
 import path from "path";
 
 import { FfmpegCommand } from "./fluent-ffmpeg";
@@ -42,23 +42,24 @@ export const save = (self: FfmpegCommand) => (output: any) => {
  * @param {Object} [options={}] pipe options
  * @return Output stream
  */
-export const stream = (self: FfmpegCommand) => (stream: any, options?: any) => {
-  if (stream && !("writable" in stream)) {
-    options = stream;
-    stream = undefined;
-  }
-
-  if (!stream) {
-    if (process.version.match(/v0\.8\./)) {
-      throw new Error("PassThrough stream is not supported on node v0.8");
+export const stream =
+  (self: FfmpegCommand) => (stream?: WriteStream, options?: any) => {
+    if (stream && !("writable" in stream)) {
+      options = stream;
+      stream = undefined;
     }
 
-    stream = new PassThrough();
-  }
+    if (!stream) {
+      if (process.version.match(/v0\.8\./)) {
+        throw new Error("PassThrough stream is not supported on node v0.8");
+      }
 
-  self.output(stream, options).run();
-  return stream;
-};
+      stream = new PassThrough();
+    }
+
+    self.output(stream, options).run();
+    return stream;
+  };
 
 /**
  * Generate images from a video

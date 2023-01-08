@@ -89,14 +89,14 @@ export const inputOptions =
  */
 export const outputOptions =
   (self: FfmpegCommand) =>
-  (...args: any[]) => {
-    let options = args[0];
+  (...argument: any[]) => {
+    let [options] = argument;
     let doSplit = true;
 
     //@ts-ignore
-    if (args.length > 1) {
+    if (argument.length > 1) {
       //@ts-ignore
-      options = [].slice.call(args);
+      options = [].slice.call(argument);
       doSplit = false;
     }
 
