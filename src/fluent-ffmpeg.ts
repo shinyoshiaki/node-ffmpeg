@@ -37,7 +37,7 @@ var ARGLISTS = [
  * @param {Number} [options.timeout=<no timeout>] ffmpeg processing timeout in seconds
  * @param {String|ReadableStream} [options.source=<no input>] alias for the `input` parameter
  */
-function FfmpegCommand(this: any, input: any, options: any) {
+function FfmpegCommand(this: any, input: any, options?: any) {
   // Make 'new' optional
   if (!(this instanceof FfmpegCommand)) {
     // @ts-expect-error TS(7009): 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
@@ -264,3 +264,5 @@ FfmpegCommand.ffprobe = function (file: any) {
 /* Add processing recipes */
 
 require("./recipes")(FfmpegCommand.prototype);
+
+export default FfmpegCommand;
