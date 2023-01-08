@@ -1,31 +1,45 @@
 {
-  "name": "fluent-ffmpeg",
-  "version": "2.1.2",
+  "name": "node-ffmpeg-childprocess",
+  "version": "0.0.1",
   "description": "A fluent API to FFMPEG (http://www.ffmpeg.org)",
   "keywords": [
     "ffmpeg"
   ],
-  "author": "Stefan Schaermeli <schaermu@gmail.com>",
-  "contributors": [
-    {
-      "name": "Felix Fichte",
-      "email": "spruce@space-ships.de"
-    }
-  ],
   "license": "MIT",
-  "bugs": {
-    "mail": "schaermu@gmail.com",
-    "url": "http://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues"
+  "author": {
+    "name": "shinyoshiaki"
   },
-  "repository": "git://github.com/fluent-ffmpeg/node-fluent-ffmpeg.git",
-  "devDependencies": {
-    "mocha": "latest",
-    "should": "latest",
-    "jsdoc": "latest"
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ./src --fix",
+    "test": "make test",
+    "type": "tsc --noEmit"
   },
   "dependencies": {
     "async": ">=0.2.9",
     "which": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/async": "^3.2.16",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.47.1",
+    "@typescript-eslint/parser": "^5.47.1",
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "jsdoc": "latest",
+    "mocha": "latest",
+    "should": "latest",
+    "ts-migrate": "^0.1.35",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.4"
   },
   "engines": {
     "node": ">=0.8.0"
