@@ -1,13 +1,11 @@
 /*jshint node:true*/
 "use strict";
 
-const fs = require("fs");
+import async from "async";
+import fs from "fs";
+import path from "path";
 
-const path = require("path");
-
-const async = require("async");
-
-const utils = require("./utils");
+import utils from "./utils";
 
 /*
  *! Capability helpers

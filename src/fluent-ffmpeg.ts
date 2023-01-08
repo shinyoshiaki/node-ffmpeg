@@ -1,13 +1,12 @@
 /*jshint node:true*/
 "use strict";
 
-const path = require("path");
-
-const util = require("util");
+import path from "path";
+import util from "util";
 
 const EventEmitter = require("events").EventEmitter;
 
-const utils = require("./utils");
+import utils from "./utils";
 const ARGLISTS = [
   "_global",
   "_audio",

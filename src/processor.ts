@@ -3,13 +3,9 @@
 
 const spawn = require("child_process").spawn;
 
-const path = require("path");
+import async from "async";
 
-const fs = require("fs");
-
-const async = require("async");
-
-const utils = require("./utils");
+import utils from "./utils";
 
 /*
  *! Processor methods

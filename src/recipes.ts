@@ -1,15 +1,14 @@
 /*jshint node:true*/
 "use strict";
 
-const fs = require("fs");
-
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 const PassThrough = require("stream").PassThrough;
 
-const async = require("async");
+import async from "async";
 
-const utils = require("./utils");
+import utils from "./utils";
 
 /*
  * Useful recipes for commands

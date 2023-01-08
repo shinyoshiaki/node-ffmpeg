@@ -4,7 +4,7 @@
 
 var fs = require("fs");
 var path = require("path");
-import ffmpeg from "../lib";
+import ffmpeg from "../src";
 
 var pathToSourceFile = path.resolve(
   __dirname,

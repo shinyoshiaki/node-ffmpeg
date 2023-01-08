@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-const utils = require("../utils");
+import utils from "../utils";
 
 /*
  *! Custom options methods
