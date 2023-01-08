@@ -1,15 +1,15 @@
 /*jshint node:true*/
 "use strict";
 
-var fs = require("fs");
+const fs = require("fs");
 
-var path = require("path");
+const path = require("path");
 
-var PassThrough = require("stream").PassThrough;
+const PassThrough = require("stream").PassThrough;
 
-var async = require("async");
+const async = require("async");
 
-var utils = require("./utils");
+const utils = require("./utils");
 
 /*
  * Useful recipes for commands
@@ -107,8 +107,8 @@ module.exports = function recipes(proto: any) {
     proto.screenshot =
     proto.screenshots =
       function (config: any, folder: any) {
-        var self = this;
-        var source = this._currentInput.source;
+        const self = this;
+        const source = this._currentInput.source;
         config = config || { count: 1 };
 
         // Accept a number of screenshots instead of a config object
@@ -136,9 +136,9 @@ module.exports = function recipes(proto: any) {
             );
           }
 
-          var interval = 100 / (1 + config.count);
+          const interval = 100 / (1 + config.count);
           config.timemarks = [];
-          for (var i = 0; i < config.count; i++) {
+          for (let i = 0; i < config.count; i++) {
             config.timemarks.push(interval * (i + 1) + "%");
           }
         }
@@ -156,7 +156,7 @@ module.exports = function recipes(proto: any) {
         }
 
         // Metadata helper
-        var metadata: any;
+        let metadata: any;
         function getMetadata(cb: any) {
           if (metadata) {
             cb(null, metadata);
@@ -190,7 +190,7 @@ module.exports = function recipes(proto: any) {
                     next(err);
                   } else {
                     // Select video stream with the highest resolution
-                    var vstream = meta.streams.reduce(
+                    const vstream = meta.streams.reduce(
                       function (biggest: any, stream: any) {
                         if (
                           stream.codec_type === "video" &&
@@ -213,7 +213,7 @@ module.exports = function recipes(proto: any) {
                       );
                     }
 
-                    var duration = Number(vstream.duration);
+                    let duration = Number(vstream.duration);
                     if (isNaN(duration)) {
                       duration = Number(meta.format.duration);
                     }
@@ -259,14 +259,14 @@ module.exports = function recipes(proto: any) {
 
             // Add '_%i' to pattern when requesting multiple screenshots and no variable token is present
             function fixPattern(next: any) {
-              var pattern = config.filename || "tn.png";
+              let pattern = config.filename || "tn.png";
 
               if (pattern.indexOf(".") === -1) {
                 pattern += ".png";
               }
 
               if (config.timemarks.length > 1 && !pattern.match(/%(s|0*i)/)) {
-                var ext = path.extname(pattern);
+                const ext = path.extname(pattern);
                 pattern = path.join(
                   path.dirname(pattern),
                   path.basename(pattern, ext) + "_%i" + ext
@@ -311,7 +311,7 @@ module.exports = function recipes(proto: any) {
                     );
                   }
 
-                  var vstream = meta.streams.reduce(
+                  const vstream = meta.streams.reduce(
                     function (biggest: any, stream: any) {
                       if (
                         stream.codec_type === "video" &&
@@ -334,8 +334,8 @@ module.exports = function recipes(proto: any) {
                     );
                   }
 
-                  var width = vstream.width;
-                  var height = vstream.height;
+                  let width = vstream.width;
+                  let height = vstream.height;
 
                   if (fixedWidth) {
                     height = (height * Number(fixedWidth[1])) / width;
@@ -377,11 +377,11 @@ module.exports = function recipes(proto: any) {
 
             // Replace variable tokens in pattern (%s, %i) and generate filename list
             function replaceVariableTokens(pattern: any, next: any) {
-              var filenames = config.timemarks.map(function (t: any, i: any) {
+              const filenames = config.timemarks.map(function (t: any, i: any) {
                 return pattern
                   .replace(/%s/g, utils.timemarkToSeconds(t))
                   .replace(/%(0*)i/g, function (match: any, padding: any) {
-                    var idx = "" + (i + 1);
+                    const idx = "" + (i + 1);
                     return (
                       padding.substr(
                         0,
@@ -417,9 +417,9 @@ module.exports = function recipes(proto: any) {
               return self.emit("error", err);
             }
 
-            var count = config.timemarks.length;
-            var split;
-            var filters = [
+            const count = config.timemarks.length;
+            let split;
+            let filters = [
               (split = {
                 filter: "split",
                 options: count,
@@ -432,7 +432,7 @@ module.exports = function recipes(proto: any) {
               self.size(config.size);
 
               // Get size filters and chain them with 'sizeN' stream names
-              var sizeFilters = self._currentOutput.sizeFilters
+              const sizeFilters = self._currentOutput.sizeFilters
                 .get()
                 .map(function (f: any, i: any) {
                   if (i > 0) {
@@ -455,9 +455,9 @@ module.exports = function recipes(proto: any) {
               self._currentOutput.sizeFilters.clear();
             }
 
-            var first = 0;
-            for (var i = 0; i < count; i++) {
-              var stream = "screen" + i;
+            let first = 0;
+            for (let i = 0; i < count; i++) {
+              const stream = "screen" + i;
               // @ts-expect-error TS(2345): Argument of type 'string' is not assignable to par... Remove this comment to see the full error message
               split.outputs.push(stream);
 
@@ -500,11 +500,11 @@ module.exports = function recipes(proto: any) {
     proto.concat =
       function (target: any, options: any) {
         // Find out which streams are present in the first non-stream input
-        var fileInput = this._inputs.filter(function (input: any) {
+        const fileInput = this._inputs.filter(function (input: any) {
           return !input.isStream;
         })[0];
 
-        var self = this;
+        const self = this;
         this.ffprobe(
           this._inputs.indexOf(fileInput),
           function (err: any, data: any) {
@@ -512,11 +512,11 @@ module.exports = function recipes(proto: any) {
               return self.emit("error", err);
             }
 
-            var hasAudioStreams = data.streams.some(function (stream: any) {
+            const hasAudioStreams = data.streams.some(function (stream: any) {
               return stream.codec_type === "audio";
             });
 
-            var hasVideoStreams = data.streams.some(function (stream: any) {
+            const hasVideoStreams = data.streams.some(function (stream: any) {
               return stream.codec_type === "video";
             });
 

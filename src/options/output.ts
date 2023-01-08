@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-var utils = require("../utils");
+const utils = require("../utils");
 
 /*
  *! Output-related methods
@@ -20,7 +20,7 @@ module.exports = function (proto: any) {
    * @return FfmpegCommand
    */
   proto.addOutput = proto.output = function (target: any, pipeopts: any) {
-    var isFile = false;
+    let isFile = false;
 
     if (!target && this._currentOutput) {
       // No target is only allowed when called from constructor
@@ -32,7 +32,7 @@ module.exports = function (proto: any) {
         throw new Error("Invalid output");
       }
     } else if (typeof target === "string") {
-      var protocol = target.match(/^([a-z]{2,}):/i);
+      const protocol = target.match(/^([a-z]{2,}):/i);
       isFile = !protocol || protocol[0] === "file";
     }
 
@@ -43,7 +43,7 @@ module.exports = function (proto: any) {
       this._currentOutput.pipeopts = pipeopts || {};
     } else {
       if (target && typeof target !== "string") {
-        var hasOutputStream = this._outputs.some(function (output: any) {
+        const hasOutputStream = this._outputs.some(function (output: any) {
           return typeof output.target !== "string";
         });
 
@@ -61,7 +61,7 @@ module.exports = function (proto: any) {
         })
       );
 
-      var self = this;
+      const self = this;
       [
         "audio",
         "audioFilters",

@@ -1,18 +1,18 @@
 /*jshint node:true*/
 "use strict";
 
-var exec = require("child_process").exec;
+const exec = require("child_process").exec;
 
-var isWindows = require("os")
+const isWindows = require("os")
   .platform()
   .match(/win(32|64)/);
 
-var which = require("which");
+const which = require("which");
 
-var nlRegexp = /\r\n|\r|\n/g;
-var streamRegexp = /^\[?(.*?)\]?$/;
-var filterEscapeRegexp = /[,]/;
-var whichCache = {};
+const nlRegexp = /\r\n|\r|\n/g;
+const streamRegexp = /^\[?(.*?)\]?$/;
+const filterEscapeRegexp = /[,]/;
+const whichCache = {};
 
 /**
  * Parse progress line from ffmpeg stderr
@@ -22,17 +22,17 @@ var whichCache = {};
  * @private
  */
 function parseProgressLine(line: any) {
-  var progress: any = {};
+  const progress: any = {};
 
   // Remove all spaces after = and trim
   line = line.replace(/=\s+/g, "=").trim();
-  var progressParts = line.split(" ");
+  const progressParts = line.split(" ");
 
   // Split every progress part by "=" to get key and value
-  for (var i = 0; i < progressParts.length; i++) {
-    var progressSplit = progressParts[i].split("=", 2);
-    var key = progressSplit[0];
-    var value = progressSplit[1];
+  for (let i = 0; i < progressParts.length; i++) {
+    const progressSplit = progressParts[i].split("=", 2);
+    const key = progressSplit[0];
+    const value = progressSplit[1];
 
     // This is not a progress line
     if (typeof value === "undefined") return null;
@@ -74,10 +74,10 @@ var utils = (module.exports = {
    * @private
    */
   args: function () {
-    var list: any = [];
+    let list: any = [];
 
     // Append argument(s) to the list
-    var argfunc = function () {
+    const argfunc = function () {
       if (arguments.length === 1 && Array.isArray(arguments[0])) {
         list = list.concat(arguments[0]);
       } else {
@@ -100,7 +100,7 @@ var utils = (module.exports = {
     // Find argument 'arg' in list, and if found, return an array of the 'count' items that follow it
     // @ts-expect-error TS(2339): Property 'find' does not exist on type '() => void... Remove this comment to see the full error message
     argfunc.find = function (arg: any, count: any) {
-      var index = list.indexOf(arg);
+      const index = list.indexOf(arg);
       if (index !== -1) {
         return list.slice(index + 1, index + 1 + (count || 0));
       }
@@ -109,7 +109,7 @@ var utils = (module.exports = {
     // Find argument 'arg' in list, and if found, remove it as well as the 'count' items that follow it
     // @ts-expect-error TS(2339): Property 'remove' does not exist on type '() => vo... Remove this comment to see the full error message
     argfunc.remove = function (arg: any, count: any) {
-      var index = list.indexOf(arg);
+      const index = list.indexOf(arg);
       if (index !== -1) {
         list.splice(index, (count || 0) + 1);
       }
@@ -118,7 +118,7 @@ var utils = (module.exports = {
     // Clone argument list
     // @ts-expect-error TS(2339): Property 'clone' does not exist on type '() => voi... Remove this comment to see the full error message
     argfunc.clone = function () {
-      var cloned = utils.args();
+      const cloned = utils.args();
       cloned(list);
       return cloned;
     };
@@ -146,7 +146,7 @@ var utils = (module.exports = {
         return filterSpec;
       }
 
-      var filterString = "";
+      let filterString = "";
 
       // Filter string format is:
       // [input1][input2]...filter[output1][output2]...
@@ -198,7 +198,7 @@ var utils = (module.exports = {
             "=" +
             Object.keys(filterSpec.options)
               .map(function (option) {
-                var value = filterSpec.options[option];
+                let value = filterSpec.options[option];
 
                 if (
                   typeof value === "string" &&
@@ -270,10 +270,10 @@ var utils = (module.exports = {
       return Number(timemark);
     }
 
-    var parts = timemark.split(":");
+    const parts = timemark.split(":");
 
     // add seconds
-    var secs = Number(parts.pop());
+    let secs = Number(parts.pop());
 
     if (parts.length) {
       // add minutes
@@ -303,10 +303,10 @@ var utils = (module.exports = {
     stderrLine: any,
     codecsObject: any
   ) {
-    var inputPattern = /Input #[0-9]+, ([^ ]+),/;
-    var durPattern = /Duration\: ([^,]+)/;
-    var audioPattern = /Audio\: (.*)/;
-    var videoPattern = /Video\: (.*)/;
+    const inputPattern = /Input #[0-9]+, ([^ ]+),/;
+    const durPattern = /Duration\: ([^,]+)/;
+    const audioPattern = /Audio\: (.*)/;
+    const videoPattern = /Video\: (.*)/;
 
     if (!("inputStack" in codecsObject)) {
       codecsObject.inputStack = [];
@@ -314,11 +314,11 @@ var utils = (module.exports = {
       codecsObject.inInput = false;
     }
 
-    var inputStack = codecsObject.inputStack;
-    var inputIndex = codecsObject.inputIndex;
-    var inInput = codecsObject.inInput;
+    const inputStack = codecsObject.inputStack;
+    let inputIndex = codecsObject.inputIndex;
+    let inInput = codecsObject.inInput;
 
-    var format, dur, audio, video;
+    let format, dur, audio, video;
 
     if ((format = stderrLine.match(inputPattern))) {
       inInput = codecsObject.inInput = true;
@@ -360,11 +360,11 @@ var utils = (module.exports = {
    * @private
    */
   extractProgress: function (command: any, stderrLine: any) {
-    var progress = parseProgressLine(stderrLine);
+    const progress = parseProgressLine(stderrLine);
 
     if (progress) {
       // build progress report object
-      var ret = {
+      const ret = {
         frames: parseInt(progress.frame, 10),
 
         currentFps: parseInt(progress.fps, 10),
@@ -384,7 +384,7 @@ var utils = (module.exports = {
         command._ffprobeData.format &&
         command._ffprobeData.format.duration
       ) {
-        var duration = Number(command._ffprobeData.format.duration);
+        const duration = Number(command._ffprobeData.format.duration);
         if (!isNaN(duration))
           // @ts-expect-error TS(2339): Property 'percent' does not exist on type '{ frame... Remove this comment to see the full error message
           ret.percent =
@@ -426,11 +426,11 @@ var utils = (module.exports = {
    * @param {Numebr} maxLines maximum number of lines to store (<= 0 for unlimited)
    */
   linesRing: function (maxLines: any) {
-    var cbs: any = [];
-    var lines: any = [];
-    var current: any = null;
-    var closed = false;
-    var max = maxLines - 1;
+    const cbs: any = [];
+    const lines: any = [];
+    let current: any = null;
+    let closed = false;
+    const max = maxLines - 1;
 
     function emit(line: any) {
       // @ts-expect-error TS(7006): Parameter 'cb' implicitly has an 'any' type.
@@ -454,7 +454,7 @@ var utils = (module.exports = {
         if (str instanceof Buffer) str = "" + str;
         if (!str || str.length === 0) return;
 
-        var newLines = str.split(nlRegexp);
+        const newLines = str.split(nlRegexp);
 
         if (newLines.length === 1) {
           if (current !== null) {

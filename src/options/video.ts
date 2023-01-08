@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-var utils = require("../utils");
+const utils = require("../utils");
 
 /*
  *! Video-related methods

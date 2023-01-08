@@ -65,7 +65,7 @@ function getScalePadFilters(width: any, height: any, aspect: any, color: any) {
  */
 function createSizeFilters(output: any, key: any, value: any) {
   // Store parameters
-  var data = (output.sizeData = output.sizeData || {});
+  const data = (output.sizeData = output.sizeData || {});
   data[key] = value;
 
   if (!("size" in data)) {
@@ -74,14 +74,14 @@ function createSizeFilters(output: any, key: any, value: any) {
   }
 
   // Try to match the different size string formats
-  var fixedSize = data.size.match(/([0-9]+)x([0-9]+)/);
-  var fixedWidth = data.size.match(/([0-9]+)x\?/);
-  var fixedHeight = data.size.match(/\?x([0-9]+)/);
-  var percentRatio = data.size.match(/\b([0-9]{1,3})%/);
-  var width, height, aspect;
+  const fixedSize = data.size.match(/([0-9]+)x([0-9]+)/);
+  const fixedWidth = data.size.match(/([0-9]+)x\?/);
+  const fixedHeight = data.size.match(/\?x([0-9]+)/);
+  const percentRatio = data.size.match(/\b([0-9]{1,3})%/);
+  let width, height, aspect;
 
   if (percentRatio) {
-    var ratio = Number(percentRatio[1]) / 100;
+    const ratio = Number(percentRatio[1]) / 100;
     return [
       {
         filter: "scale",
@@ -214,7 +214,7 @@ module.exports = function (proto: any) {
     proto.setSize =
     proto.size =
       function (size: any) {
-        var filters = createSizeFilters(this._currentOutput, "size", size);
+        const filters = createSizeFilters(this._currentOutput, "size", size);
 
         this._currentOutput.sizeFilters.clear();
         this._currentOutput.sizeFilters(filters);
@@ -239,9 +239,9 @@ module.exports = function (proto: any) {
     proto.aspect =
     proto.aspectRatio =
       function (aspect: any) {
-        var a = Number(aspect);
+        let a = Number(aspect);
         if (isNaN(a)) {
-          var match = aspect.match(/^(\d+):(\d+)$/);
+          const match = aspect.match(/^(\d+):(\d+)$/);
           if (match) {
             a = Number(match[1]) / Number(match[2]);
           } else {
@@ -249,7 +249,7 @@ module.exports = function (proto: any) {
           }
         }
 
-        var filters = createSizeFilters(this._currentOutput, "aspect", a);
+        const filters = createSizeFilters(this._currentOutput, "aspect", a);
 
         this._currentOutput.sizeFilters.clear();
         this._currentOutput.sizeFilters(filters);
@@ -289,7 +289,7 @@ module.exports = function (proto: any) {
           pad = true;
         }
 
-        var filters = createSizeFilters(
+        const filters = createSizeFilters(
           this._currentOutput,
           "pad",
           pad ? color || "black" : false

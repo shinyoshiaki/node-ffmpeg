@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-var utils = require("../utils");
+const utils = require("../utils");
 
 /*
  *! Custom options methods
@@ -43,7 +43,7 @@ module.exports = function (proto: any) {
           throw new Error("No input specified");
         }
 
-        var doSplit = true;
+        let doSplit = true;
 
         if (arguments.length > 1) {
           options = [].slice.call(arguments);
@@ -56,7 +56,7 @@ module.exports = function (proto: any) {
 
         this._currentInput.options(
           options.reduce(function (options: any, option: any) {
-            var split = String(option).split(" ");
+            const split = String(option).split(" ");
 
             if (doSplit && split.length === 2) {
               options.push(split[0], split[1]);
@@ -100,7 +100,7 @@ module.exports = function (proto: any) {
     proto.outputOption =
     proto.outputOptions =
       function (options: any) {
-        var doSplit = true;
+        let doSplit = true;
 
         if (arguments.length > 1) {
           options = [].slice.call(arguments);
@@ -113,7 +113,7 @@ module.exports = function (proto: any) {
 
         this._currentOutput.options(
           options.reduce(function (options: any, option: any) {
-            var split = String(option).split(" ");
+            const split = String(option).split(" ");
 
             if (doSplit && split.length === 2) {
               options.push(split[0], split[1]);
@@ -204,7 +204,7 @@ module.exports = function (proto: any) {
     );
 
     if (Array.isArray(map)) {
-      var self = this;
+      const self = this;
       map.forEach(function (streamSpec) {
         self._complexFilters(
           "-map",

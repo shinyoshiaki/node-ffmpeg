@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-var path = require("path");
+const path = require("path");
 
 /*
  *! Miscellaneous methods
@@ -24,7 +24,7 @@ module.exports = function (proto: any) {
       try {
         var modulePath = path.join(this.options.presets, preset);
 
-        var module = require(modulePath);
+        const module = require(modulePath);
 
         if (typeof module.load === "function") {
           module.load(this);

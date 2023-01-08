@@ -1,7 +1,7 @@
 /*jshint node:true*/
 "use strict";
 
-var utils = require("../utils");
+const utils = require("../utils");
 
 /*
  *! Input-related methods
@@ -27,15 +27,15 @@ module.exports = function (proto: any) {
     proto.addInput =
     proto.input =
       function (source: any) {
-        var isFile = false;
-        var isStream = false;
+        let isFile = false;
+        let isStream = false;
 
         if (typeof source !== "string") {
           if (!("readable" in source) || !source.readable) {
             throw new Error("Invalid input");
           }
 
-          var hasInputStream = this._inputs.some(function (input: any) {
+          const hasInputStream = this._inputs.some(function (input: any) {
             return input.isStream;
           });
 
@@ -46,7 +46,7 @@ module.exports = function (proto: any) {
           isStream = true;
           source.pause();
         } else {
-          var protocol = source.match(/^([a-z]{2,}):/i);
+          const protocol = source.match(/^([a-z]{2,}):/i);
           isFile = !protocol || protocol[0] === "file";
         }
 

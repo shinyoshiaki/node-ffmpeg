@@ -1,14 +1,14 @@
 /*jshint node:true*/
 "use strict";
 
-var path = require("path");
+const path = require("path");
 
-var util = require("util");
+const util = require("util");
 
-var EventEmitter = require("events").EventEmitter;
+const EventEmitter = require("events").EventEmitter;
 
-var utils = require("./utils");
-var ARGLISTS = [
+const utils = require("./utils");
+const ARGLISTS = [
   "_global",
   "_audio",
   "_audioFilters",
@@ -70,7 +70,7 @@ function FfmpegCommand(this: any, input: any, options?: any) {
   this.output();
 
   // Create argument lists
-  var self = this;
+  const self = this;
   ["_global", "_complexFilters"].forEach(function (prop) {
     // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     self[prop] = utils.args();
@@ -130,8 +130,8 @@ module.exports = FfmpegCommand;
  */
 FfmpegCommand.prototype.clone = function () {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  var clone = new FfmpegCommand();
-  var self = this;
+  const clone = new FfmpegCommand();
+  const self = this;
 
   // Clone options and logger
   clone.options = this.options;
@@ -257,7 +257,7 @@ require("./ffprobe")(FfmpegCommand.prototype);
 
 FfmpegCommand.ffprobe = function (file: any) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-  var instance = new FfmpegCommand(file);
+  const instance = new FfmpegCommand(file);
   instance.ffprobe.apply(instance, Array.prototype.slice.call(arguments, 1));
 };
 

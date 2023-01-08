@@ -1,31 +1,32 @@
 /*jshint node:true*/
 "use strict";
 
-var fs = require("fs");
+const fs = require("fs");
 
-var path = require("path");
+const path = require("path");
 
-var async = require("async");
+const async = require("async");
 
-var utils = require("./utils");
+const utils = require("./utils");
 
 /*
  *! Capability helpers
  */
 
-var avCodecRegexp = /^\s*([D ])([E ])([VAS])([S ])([D ])([T ]) ([^ ]+) +(.*)$/;
-var ffCodecRegexp =
+const avCodecRegexp =
+  /^\s*([D ])([E ])([VAS])([S ])([D ])([T ]) ([^ ]+) +(.*)$/;
+const ffCodecRegexp =
   /^\s*([D\.])([E\.])([VAS])([I\.])([L\.])([S\.]) ([^ ]+) +(.*)$/;
-var ffEncodersRegexp = /\(encoders:([^\)]+)\)/;
-var ffDecodersRegexp = /\(decoders:([^\)]+)\)/;
-var encodersRegexp =
+const ffEncodersRegexp = /\(encoders:([^\)]+)\)/;
+const ffDecodersRegexp = /\(decoders:([^\)]+)\)/;
+const encodersRegexp =
   /^\s*([VAS\.])([F\.])([S\.])([X\.])([B\.])([D\.]) ([^ ]+) +(.*)$/;
-var formatRegexp = /^\s*([D ])([E ]) ([^ ]+) +(.*)$/;
-var lineBreakRegexp = /\r\n|\r|\n/;
-var filterRegexp =
+const formatRegexp = /^\s*([D ])([E ]) ([^ ]+) +(.*)$/;
+const lineBreakRegexp = /\r\n|\r|\n/;
+const filterRegexp =
   /^(?: [T\.][S\.][C\.] )?([^ ]+) +(AA?|VV?|\|)->(AA?|VV?|\|) +(.*)$/;
 
-var cache = {};
+const cache = {};
 
 module.exports = function (proto: any) {
   /**
@@ -153,7 +154,7 @@ module.exports = function (proto: any) {
    * @private
    */
   proto._getFfprobePath = function (callback: any) {
-    var self = this;
+    const self = this;
 
     if ("ffprobePath" in cache) {
       return callback(null, cache.ffprobePath);
@@ -193,8 +194,8 @@ module.exports = function (proto: any) {
             if (err) {
               cb(err);
             } else if (ffmpeg.length) {
-              var name = utils.isWindows ? "ffprobe.exe" : "ffprobe";
-              var ffprobe = path.join(path.dirname(ffmpeg), name);
+              const name = utils.isWindows ? "ffprobe.exe" : "ffprobe";
+              const ffprobe = path.join(path.dirname(ffmpeg), name);
               fs.exists(ffprobe, function (exists: any) {
                 cb(null, exists ? ffprobe : "");
               });
@@ -329,13 +330,13 @@ module.exports = function (proto: any) {
           return callback(err);
         }
 
-        var stdout = stdoutRing.get();
-        var lines = stdout.split("\n");
-        var data = {};
-        var types = { A: "audio", V: "video", "|": "none" };
+        const stdout = stdoutRing.get();
+        const lines = stdout.split("\n");
+        const data = {};
+        const types = { A: "audio", V: "video", "|": "none" };
 
         lines.forEach(function (line: any) {
-          var match = line.match(filterRegexp);
+          const match = line.match(filterRegexp);
           if (match) {
             // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             data[match[1]] = {
@@ -391,12 +392,12 @@ module.exports = function (proto: any) {
           return callback(err);
         }
 
-        var stdout = stdoutRing.get();
-        var lines = stdout.split(lineBreakRegexp);
-        var data = {};
+        const stdout = stdoutRing.get();
+        const lines = stdout.split(lineBreakRegexp);
+        const data = {};
 
         lines.forEach(function (line: any) {
-          var match = line.match(avCodecRegexp);
+          let match = line.match(avCodecRegexp);
           if (match && match[7] !== "=") {
             // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             data[match[7]] = {
@@ -414,7 +415,7 @@ module.exports = function (proto: any) {
           match = line.match(ffCodecRegexp);
           if (match && match[7] !== "=") {
             // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-            var codecData = (data[match[7]] = {
+            const codecData = (data[match[7]] = {
               // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
               type: { V: "video", A: "audio", S: "subtitle" }[match[3]],
               description: match[8],
@@ -425,14 +426,14 @@ module.exports = function (proto: any) {
               isLossless: match[6] === "S",
             });
 
-            var encoders = codecData.description.match(ffEncodersRegexp);
+            let encoders = codecData.description.match(ffEncodersRegexp);
             encoders = encoders ? encoders[1].trim().split(" ") : [];
 
-            var decoders = codecData.description.match(ffDecodersRegexp);
+            let decoders = codecData.description.match(ffDecodersRegexp);
             decoders = decoders ? decoders[1].trim().split(" ") : [];
 
             if (encoders.length || decoders.length) {
-              var coderData = {};
+              const coderData = {};
               utils.copy(codecData, coderData);
               // @ts-expect-error TS(2339): Property 'canEncode' does not exist on type '{}'.
               delete coderData.canEncode;
@@ -511,12 +512,12 @@ module.exports = function (proto: any) {
           return callback(err);
         }
 
-        var stdout = stdoutRing.get();
-        var lines = stdout.split(lineBreakRegexp);
-        var data = {};
+        const stdout = stdoutRing.get();
+        const lines = stdout.split(lineBreakRegexp);
+        const data = {};
 
         lines.forEach(function (line: any) {
-          var match = line.match(encodersRegexp);
+          const match = line.match(encodersRegexp);
           if (match && match[7] !== "=") {
             // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             data[match[7]] = {
@@ -576,12 +577,12 @@ module.exports = function (proto: any) {
         }
 
         // Parse output
-        var stdout = stdoutRing.get();
-        var lines = stdout.split(lineBreakRegexp);
-        var data = {};
+        const stdout = stdoutRing.get();
+        const lines = stdout.split(lineBreakRegexp);
+        const data = {};
 
         lines.forEach(function (line: any) {
-          var match = line.match(formatRegexp);
+          const match = line.match(formatRegexp);
           if (match) {
             match[3].split(",").forEach(function (format: any) {
               if (!(format in data)) {
@@ -621,7 +622,7 @@ module.exports = function (proto: any) {
    * @private
    */
   proto._checkCapabilities = function (callback: any) {
-    var self = this;
+    const self = this;
     async.waterfall(
       [
         // Get available formats
@@ -631,11 +632,11 @@ module.exports = function (proto: any) {
 
         // Check whether specified formats are available
         function (formats: any, cb: any) {
-          var unavailable;
+          let unavailable;
 
           // Output format(s)
           unavailable = self._outputs.reduce(function (fmts: any, output: any) {
-            var format = output.options.find("-f", 1);
+            const format = output.options.find("-f", 1);
             if (format) {
               if (!(format[0] in formats) || !formats[format[0]].canMux) {
                 fmts.push(format);
@@ -661,7 +662,7 @@ module.exports = function (proto: any) {
 
           // Input format(s)
           unavailable = self._inputs.reduce(function (fmts: any, input: any) {
-            var format = input.options.find("-f", 1);
+            const format = input.options.find("-f", 1);
             if (format) {
               if (!(format[0] in formats) || !formats[format[0]].canDemux) {
                 fmts.push(format[0]);
@@ -693,11 +694,11 @@ module.exports = function (proto: any) {
 
         // Check whether specified codecs are available and add strict experimental options if needed
         function (encoders: any, cb: any) {
-          var unavailable;
+          let unavailable;
 
           // Audio codec(s)
           unavailable = self._outputs.reduce(function (cdcs: any, output: any) {
-            var acodec = output.audio.find("-acodec", 1);
+            const acodec = output.audio.find("-acodec", 1);
             if (acodec && acodec[0] !== "copy") {
               if (
                 !(acodec[0] in encoders) ||
@@ -724,7 +725,7 @@ module.exports = function (proto: any) {
 
           // Video codec(s)
           unavailable = self._outputs.reduce(function (cdcs: any, output: any) {
-            var vcodec = output.video.find("-vcodec", 1);
+            const vcodec = output.video.find("-vcodec", 1);
             if (vcodec && vcodec[0] !== "copy") {
               if (
                 !(vcodec[0] in encoders) ||

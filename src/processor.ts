@@ -1,15 +1,15 @@
 /*jshint node:true*/
 "use strict";
 
-var spawn = require("child_process").spawn;
+const spawn = require("child_process").spawn;
 
-var path = require("path");
+const path = require("path");
 
-var fs = require("fs");
+const fs = require("fs");
 
-var async = require("async");
+const async = require("async");
 
-var utils = require("./utils");
+const utils = require("./utils");
 
 /*
  *! Processor methods
@@ -130,7 +130,7 @@ module.exports = function (proto: any) {
       processCB = function () {};
     }
 
-    var maxLines =
+    const maxLines =
       "stdoutLines" in options ? options.stdoutLines : this.options.stdoutLines;
 
     // Find ffmpeg
@@ -147,14 +147,14 @@ module.exports = function (proto: any) {
         command = "nice";
       }
 
-      var stdoutRing = utils.linesRing(maxLines);
-      var stdoutClosed = false;
+      const stdoutRing = utils.linesRing(maxLines);
+      let stdoutClosed = false;
 
-      var stderrRing = utils.linesRing(maxLines);
-      var stderrClosed = false;
+      const stderrRing = utils.linesRing(maxLines);
+      let stderrClosed = false;
 
       // Spawn process
-      var ffmpegProc = spawn(command, args, options);
+      const ffmpegProc = spawn(command, args, options);
 
       if (ffmpegProc.stderr) {
         ffmpegProc.stderr.setEncoding("utf8");
@@ -165,7 +165,7 @@ module.exports = function (proto: any) {
       });
 
       // Ensure we wait for captured streams to end before calling endCB
-      var exitError: any = null;
+      let exitError: any = null;
       function handleExit(err: any) {
         if (err) {
           exitError = err;
@@ -234,16 +234,17 @@ module.exports = function (proto: any) {
    * @private
    */
   proto._getArguments = function () {
-    var complexFilters = this._complexFilters.get();
+    const complexFilters = this._complexFilters.get();
 
-    var fileOutput = this._outputs.some(function (output: any) {
+    const fileOutput = this._outputs.some(function (output: any) {
       return output.isFile;
     });
 
     return [].concat(
       // Inputs and input options
       this._inputs.reduce(function (args: any, input: any) {
-        var source = typeof input.source === "string" ? input.source : "pipe:0";
+        const source =
+          typeof input.source === "string" ? input.source : "pipe:0";
 
         // For each input, add input options, then '-i <source>'
         return args.concat(input.options.get(), ["-i", source]);
@@ -261,10 +262,10 @@ module.exports = function (proto: any) {
 
       // Outputs, filters and output options
       this._outputs.reduce(function (args: any, output: any) {
-        var sizeFilters = utils.makeFilterStrings(output.sizeFilters.get());
-        var audioFilters = output.audioFilters.get();
-        var videoFilters = output.videoFilters.get().concat(sizeFilters);
-        var outputArg: any;
+        const sizeFilters = utils.makeFilterStrings(output.sizeFilters.get());
+        const audioFilters = output.audioFilters.get();
+        const videoFilters = output.videoFilters.get().concat(sizeFilters);
+        let outputArg: any;
 
         if (!output.target) {
           outputArg = [];
@@ -298,7 +299,7 @@ module.exports = function (proto: any) {
    * @private
    */
   proto._prepare = function (callback: any, readMetadata: any) {
-    var self = this;
+    const self = this;
 
     async.waterfall(
       [
@@ -324,7 +325,7 @@ module.exports = function (proto: any) {
 
         // Check for flvtool2/flvmeta if necessary
         function (cb: any) {
-          var flvmeta = self._outputs.some(function (output: any) {
+          const flvmeta = self._outputs.some(function (output: any) {
             // Remove flvmeta flag on non-file output
             if (output.flags.flvmeta && !output.isFile) {
               self.logger.warn(
@@ -347,7 +348,7 @@ module.exports = function (proto: any) {
 
         // Build argument list
         function (cb: any) {
-          var args;
+          let args;
           try {
             args = self._getArguments();
           } catch (e) {
@@ -360,7 +361,7 @@ module.exports = function (proto: any) {
         // Add "-strict experimental" option where needed
         function (args: any, cb: any) {
           self.availableEncoders(function (err: any, encoders: any) {
-            for (var i = 0; i < args.length; i++) {
+            for (let i = 0; i < args.length; i++) {
               if (args[i] === "-acodec" || args[i] === "-vcodec") {
                 i++;
 
@@ -406,10 +407,10 @@ module.exports = function (proto: any) {
     proto.execute =
     proto.run =
       function () {
-        var self = this;
+        const self = this;
 
         // Check if at least one output is present
-        var outputPresent = this._outputs.some(function (output: any) {
+        const outputPresent = this._outputs.some(function (output: any) {
           return "target" in output;
         });
 
@@ -418,17 +419,17 @@ module.exports = function (proto: any) {
         }
 
         // Get output stream if any
-        var outputStream = this._outputs.filter(function (output: any) {
+        const outputStream = this._outputs.filter(function (output: any) {
           return typeof output.target !== "string";
         })[0];
 
         // Get input stream if any
-        var inputStream = this._inputs.filter(function (input: any) {
+        const inputStream = this._inputs.filter(function (input: any) {
           return typeof input.source !== "string";
         })[0];
 
         // Ensure we send 'end' or 'error' only once
-        var ended = false;
+        let ended = false;
         function emitEnd(err: any, stdout: any, stderr: any) {
           if (!ended) {
             ended = true;
@@ -468,7 +469,7 @@ module.exports = function (proto: any) {
               // Pipe input stream if any
               if (inputStream) {
                 inputStream.source.on("error", function (err: any) {
-                  var reportingErr = new Error(
+                  const reportingErr = new Error(
                     "Input stream error: " + err.message
                   );
                   // @ts-expect-error TS(2339): Property 'inputStreamError' does not exist on type... Remove this comment to see the full error message
@@ -489,7 +490,7 @@ module.exports = function (proto: any) {
               // Setup timeout if requested
               if (self.options.timeout) {
                 self.processTimer = setTimeout(function () {
-                  var msg =
+                  const msg =
                     "process ran into a timeout (" +
                     self.options.timeout +
                     "s)";
@@ -527,7 +528,7 @@ module.exports = function (proto: any) {
                   self.logger.debug(
                     "Output stream error, killing ffmpeg process"
                   );
-                  var reportingErr = new Error(
+                  const reportingErr = new Error(
                     "Output stream error: " + err.message
                   );
                   // @ts-expect-error TS(2339): Property 'outputStreamError' does not exist on typ... Remove this comment to see the full error message
@@ -548,8 +549,8 @@ module.exports = function (proto: any) {
 
                 // 'codecData' event
                 if (self.listeners("codecData").length) {
-                  var codecDataSent = false;
-                  var codecObject = {};
+                  let codecDataSent = false;
+                  const codecObject = {};
 
                   stderrRing.callback(function (line: any) {
                     if (!codecDataSent)
@@ -583,7 +584,7 @@ module.exports = function (proto: any) {
                 emitEnd(err, stdoutRing.get(), stderrRing.get());
               } else {
                 // Find out which outputs need flv metadata
-                var flvmeta = self._outputs.filter(function (output: any) {
+                const flvmeta = self._outputs.filter(function (output: any) {
                   return output.flags.flvmeta;
                 });
 
@@ -676,9 +677,9 @@ module.exports = function (proto: any) {
       this.options.niceness = niceness;
 
       if (this.ffmpegProc) {
-        var logger = this.logger;
-        var pid = this.ffmpegProc.pid;
-        var renice = spawn("renice", [niceness, "-p", pid], {
+        const logger = this.logger;
+        const pid = this.ffmpegProc.pid;
+        const renice = spawn("renice", [niceness, "-p", pid], {
           windowsHide: true,
         });
 

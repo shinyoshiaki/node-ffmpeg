@@ -1,7 +1,7 @@
 /*jshint node:true, laxcomma:true*/
 "use strict";
 
-var spawn = require("child_process").spawn;
+const spawn = require("child_process").spawn;
 
 function legacyTag(key: any) {
   return key.match(/^TAG:/);
@@ -11,22 +11,22 @@ function legacyDisposition(key: any) {
 }
 
 function parseFfprobeOutput(out: any) {
-  var lines = out.split(/\r\n|\r|\n/);
+  let lines = out.split(/\r\n|\r|\n/);
 
   lines = lines.filter(function (line: any) {
     return line.length > 0;
   });
 
-  var data = {
+  const data = {
     streams: [] as any[],
     format: {},
     chapters: [],
   };
 
   function parseBlock(name: any) {
-    var data: any = {};
+    const data: any = {};
 
-    var line = lines.shift();
+    let line = lines.shift();
     while (typeof line !== "undefined") {
       if (line.toLowerCase() == "[/" + name + "]") {
         return data;
@@ -35,7 +35,7 @@ function parseFfprobeOutput(out: any) {
         continue;
       }
 
-      var kv = line.match(/^([^=]+)=(.*)$/);
+      const kv = line.match(/^([^=]+)=(.*)$/);
       if (kv) {
         if (!kv[1].match(/^TAG:/) && kv[2].match(/^[0-9]+(\.[0-9]+)?$/)) {
           data[kv[1]] = Number(kv[2]);
@@ -50,14 +50,14 @@ function parseFfprobeOutput(out: any) {
     return data;
   }
 
-  var line = lines.shift();
+  let line = lines.shift();
   while (typeof line !== "undefined") {
     if (line.match(/^\[stream/i)) {
-      var stream = parseBlock("stream");
+      const stream = parseBlock("stream");
 
       data.streams.push(stream);
     } else if (line.match(/^\[chapter/i)) {
-      var chapter = parseBlock("chapter");
+      const chapter = parseBlock("chapter");
       // @ts-expect-error TS(2345): Argument of type '{}' is not assignable to paramet... Remove this comment to see the full error message
       data.chapters.push(chapter);
     } else if (line.toLowerCase() === "[format]") {
@@ -105,7 +105,7 @@ module.exports = function (proto: any) {
     // the last argument should be the callback
     var callback = arguments[arguments.length - 1];
 
-    var ended = false;
+    let ended = false;
     function handleCallback(err: any, data: any) {
       if (!ended) {
         ended = true;
@@ -154,14 +154,14 @@ module.exports = function (proto: any) {
         return handleCallback(new Error("Cannot find ffprobe"));
       }
 
-      var stdout = "";
-      var stdoutClosed = false;
-      var stderr = "";
-      var stderrClosed = false;
+      let stdout = "";
+      let stdoutClosed = false;
+      let stderr = "";
+      let stderrClosed = false;
 
       // Spawn ffprobe
-      var src = input.isStream ? "pipe:0" : input.source;
-      var ffprobe = spawn(
+      const src = input.isStream ? "pipe:0" : input.source;
+      const ffprobe = spawn(
         path,
         ["-show_streams", "-show_format"].concat(options, src),
         { windowsHide: true }
@@ -191,7 +191,7 @@ module.exports = function (proto: any) {
       ffprobe.on("error", callback);
 
       // Ensure we wait for captured streams to end before calling callback
-      var exitError: any = null;
+      let exitError: any = null;
       function handleExit(err: any) {
         if (err) {
           exitError = err;
@@ -208,12 +208,12 @@ module.exports = function (proto: any) {
           }
 
           // Process output
-          var data = parseFfprobeOutput(stdout);
+          const data = parseFfprobeOutput(stdout);
 
           // Handle legacy output with "TAG:x" and "DISPOSITION:x" keys
           [data.format].concat(data.streams).forEach(function (target: any) {
             if (target) {
-              var legacyTagKeys = Object.keys(target).filter(legacyTag);
+              const legacyTagKeys = Object.keys(target).filter(legacyTag);
 
               if (legacyTagKeys.length) {
                 target.tags = target.tags || {};
@@ -225,7 +225,7 @@ module.exports = function (proto: any) {
                 });
               }
 
-              var legacyDispositionKeys =
+              const legacyDispositionKeys =
                 Object.keys(target).filter(legacyDisposition);
 
               if (legacyDispositionKeys.length) {
