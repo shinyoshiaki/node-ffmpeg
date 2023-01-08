@@ -1,10 +1,9 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
 /*
  *! Size helpers
  */
-
 
 /**
  * Return filters to pad video to width*height,
@@ -30,11 +29,11 @@ function getScalePadFilters(width: any, height: any, aspect: any, color: any) {
       When using computed width/height, we truncate them to multiples of 2
      */
     {
-      filter: 'scale',
+      filter: "scale",
       options: {
-        w: 'if(gt(a,' + aspect + '),' + width + ',trunc(' + height + '*a/2)*2)',
-        h: 'if(lt(a,' + aspect + '),' + height + ',trunc(' + width + '/a/2)*2)'
-      }
+        w: "if(gt(a," + aspect + ")," + width + ",trunc(" + height + "*a/2)*2)",
+        h: "if(lt(a," + aspect + ")," + height + ",trunc(" + width + "/a/2)*2)",
+      },
     },
 
     /*
@@ -43,18 +42,17 @@ function getScalePadFilters(width: any, height: any, aspect: any, color: any) {
      */
 
     {
-      filter: 'pad',
+      filter: "pad",
       options: {
         w: width,
         h: height,
-        x: 'if(gt(a,' + aspect + '),0,(' + width + '-iw)/2)',
-        y: 'if(lt(a,' + aspect + '),0,(' + height + '-ih)/2)',
-        color: color
-      }
-    }
+        x: "if(gt(a," + aspect + "),0,(" + width + "-iw)/2)",
+        y: "if(lt(a," + aspect + "),0,(" + height + "-ih)/2)",
+        color: color,
+      },
+    },
   ];
 }
-
 
 /**
  * Recompute size filters
@@ -67,10 +65,10 @@ function getScalePadFilters(width: any, height: any, aspect: any, color: any) {
  */
 function createSizeFilters(output: any, key: any, value: any) {
   // Store parameters
-  var data = output.sizeData = output.sizeData || {};
+  var data = (output.sizeData = output.sizeData || {});
   data[key] = value;
 
-  if (!('size' in data)) {
+  if (!("size" in data)) {
     // No size requested, keep original size
     return [];
   }
@@ -84,13 +82,15 @@ function createSizeFilters(output: any, key: any, value: any) {
 
   if (percentRatio) {
     var ratio = Number(percentRatio[1]) / 100;
-    return [{
-      filter: 'scale',
-      options: {
-        w: 'trunc(iw*' + ratio + '/2)*2',
-        h: 'trunc(ih*' + ratio + '/2)*2'
-      }
-    }];
+    return [
+      {
+        filter: "scale",
+        options: {
+          w: "trunc(iw*" + ratio + "/2)*2",
+          h: "trunc(ih*" + ratio + "/2)*2",
+        },
+      },
+    ];
   } else if (fixedSize) {
     // Round target size to multiples of 2
     width = Math.round(Number(fixedSize[1]) / 2) * 2;
@@ -102,13 +102,17 @@ function createSizeFilters(output: any, key: any, value: any) {
       return getScalePadFilters(width, height, aspect, data.pad);
     } else {
       // No autopad requested, rescale to target size
-      return [{ filter: 'scale', options: { w: width, h: height }}];
+      return [{ filter: "scale", options: { w: width, h: height } }];
     }
   } else if (fixedWidth || fixedHeight) {
-    if ('aspect' in data) {
+    if ("aspect" in data) {
       // Specified aspect ratio
-      width = fixedWidth ? fixedWidth[1] : Math.round(Number(fixedHeight[1]) * data.aspect);
-      height = fixedHeight ? fixedHeight[1] : Math.round(Number(fixedWidth[1]) / data.aspect);
+      width = fixedWidth
+        ? fixedWidth[1]
+        : Math.round(Number(fixedHeight[1]) * data.aspect);
+      height = fixedHeight
+        ? fixedHeight[1]
+        : Math.round(Number(fixedWidth[1]) / data.aspect);
 
       // Round to multiples of 2
       width = Math.round(width / 2) * 2;
@@ -118,41 +122,43 @@ function createSizeFilters(output: any, key: any, value: any) {
         return getScalePadFilters(width, height, data.aspect, data.pad);
       } else {
         // No autopad requested, rescale to target size
-        return [{ filter: 'scale', options: { w: width, h: height }}];
+        return [{ filter: "scale", options: { w: width, h: height } }];
       }
     } else {
       // Keep input aspect ratio
 
       if (fixedWidth) {
-        return [{
-          filter: 'scale',
-          options: {
-            w: Math.round(Number(fixedWidth[1]) / 2) * 2,
-            h: 'trunc(ow/a/2)*2'
-          }
-        }];
+        return [
+          {
+            filter: "scale",
+            options: {
+              w: Math.round(Number(fixedWidth[1]) / 2) * 2,
+              h: "trunc(ow/a/2)*2",
+            },
+          },
+        ];
       } else {
-        return [{
-          filter: 'scale',
-          options: {
-            w: 'trunc(oh*a/2)*2',
-            h: Math.round(Number(fixedHeight[1]) / 2) * 2
-          }
-        }];
+        return [
+          {
+            filter: "scale",
+            options: {
+              w: "trunc(oh*a/2)*2",
+              h: Math.round(Number(fixedHeight[1]) / 2) * 2,
+            },
+          },
+        ];
       }
     }
   } else {
-    throw new Error('Invalid size specified: ' + data.size);
+    throw new Error("Invalid size specified: " + data.size);
   }
 }
-
 
 /*
  *! Video size-related methods
  */
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * Keep display aspect ratio
    *
@@ -167,24 +173,24 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.keepPixelAspect = // Only for compatibility, this is not about keeping _pixel_ aspect ratio
-  proto.keepDisplayAspect =
-  proto.keepDisplayAspectRatio =
-  proto.keepDAR = function() {
-    return this.videoFilters([
-      {
-        filter: 'scale',
-        options: {
-          w: 'if(gt(sar,1),iw*sar,iw)',
-          h: 'if(lt(sar,1),ih/sar,ih)'
-        }
-      },
-      {
-        filter: 'setsar',
-        options: '1'
-      }
-    ]);
-  };
-
+    proto.keepDisplayAspect =
+    proto.keepDisplayAspectRatio =
+    proto.keepDAR =
+      function () {
+        return this.videoFilters([
+          {
+            filter: "scale",
+            options: {
+              w: "if(gt(sar,1),iw*sar,iw)",
+              h: "if(lt(sar,1),ih/sar,ih)",
+            },
+          },
+          {
+            filter: "setsar",
+            options: "1",
+          },
+        ]);
+      };
 
   /**
    * Set output size
@@ -205,16 +211,16 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withSize =
-  proto.setSize =
-  proto.size = function(size: any) {
-    var filters = createSizeFilters(this._currentOutput, 'size', size);
+    proto.setSize =
+    proto.size =
+      function (size: any) {
+        var filters = createSizeFilters(this._currentOutput, "size", size);
 
-    this._currentOutput.sizeFilters.clear();
-    this._currentOutput.sizeFilters(filters);
+        this._currentOutput.sizeFilters.clear();
+        this._currentOutput.sizeFilters(filters);
 
-    return this;
-  };
-
+        return this;
+      };
 
   /**
    * Set output aspect ratio
@@ -227,29 +233,29 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withAspect =
-  proto.withAspectRatio =
-  proto.setAspect =
-  proto.setAspectRatio =
-  proto.aspect =
-  proto.aspectRatio = function(aspect: any) {
-    var a = Number(aspect);
-    if (isNaN(a)) {
-      var match = aspect.match(/^(\d+):(\d+)$/);
-      if (match) {
-        a = Number(match[1]) / Number(match[2]);
-      } else {
-        throw new Error('Invalid aspect ratio: ' + aspect);
-      }
-    }
+    proto.withAspectRatio =
+    proto.setAspect =
+    proto.setAspectRatio =
+    proto.aspect =
+    proto.aspectRatio =
+      function (aspect: any) {
+        var a = Number(aspect);
+        if (isNaN(a)) {
+          var match = aspect.match(/^(\d+):(\d+)$/);
+          if (match) {
+            a = Number(match[1]) / Number(match[2]);
+          } else {
+            throw new Error("Invalid aspect ratio: " + aspect);
+          }
+        }
 
-    var filters = createSizeFilters(this._currentOutput, 'aspect', a);
+        var filters = createSizeFilters(this._currentOutput, "aspect", a);
 
-    this._currentOutput.sizeFilters.clear();
-    this._currentOutput.sizeFilters(filters);
+        this._currentOutput.sizeFilters.clear();
+        this._currentOutput.sizeFilters(filters);
 
-    return this;
-  };
-
+        return this;
+      };
 
   /**
    * Enable auto-padding the output
@@ -262,31 +268,36 @@ module.exports = function(proto: any) {
    * @param {String} [color='black'] pad color
    */
   proto.applyAutopadding =
-  proto.applyAutoPadding =
-  proto.applyAutopad =
-  proto.applyAutoPad =
-  proto.withAutopadding =
-  proto.withAutoPadding =
-  proto.withAutopad =
-  proto.withAutoPad =
-  proto.autoPad =
-  proto.autopad = function(pad: any, color: any) {
-    // Allow autopad(color)
-    if (typeof pad === 'string') {
-      color = pad;
-      pad = true;
-    }
+    proto.applyAutoPadding =
+    proto.applyAutopad =
+    proto.applyAutoPad =
+    proto.withAutopadding =
+    proto.withAutoPadding =
+    proto.withAutopad =
+    proto.withAutoPad =
+    proto.autoPad =
+    proto.autopad =
+      function (pad: any, color: any) {
+        // Allow autopad(color)
+        if (typeof pad === "string") {
+          color = pad;
+          pad = true;
+        }
 
-    // Allow autopad() and autopad(undefined, color)
-    if (typeof pad === 'undefined') {
-      pad = true;
-    }
+        // Allow autopad() and autopad(undefined, color)
+        if (typeof pad === "undefined") {
+          pad = true;
+        }
 
-    var filters = createSizeFilters(this._currentOutput, 'pad', pad ? color || 'black' : false);
+        var filters = createSizeFilters(
+          this._currentOutput,
+          "pad",
+          pad ? color || "black" : false
+        );
 
-    this._currentOutput.sizeFilters.clear();
-    this._currentOutput.sizeFilters(filters);
+        this._currentOutput.sizeFilters.clear();
+        this._currentOutput.sizeFilters(filters);
 
-    return this;
-  };
+        return this;
+      };
 };

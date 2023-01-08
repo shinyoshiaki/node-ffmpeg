@@ -1,16 +1,13 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var utils = require('../utils');
-
+var utils = require("../utils");
 
 /*
  *! Audio-related methods
  */
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * Disable audio in the output
    *
@@ -19,15 +16,13 @@ module.exports = function(proto: any) {
    * @aliases withNoAudio
    * @return FfmpegCommand
    */
-  proto.withNoAudio =
-  proto.noAudio = function() {
+  proto.withNoAudio = proto.noAudio = function () {
     this._currentOutput.audio.clear();
     this._currentOutput.audioFilters.clear();
-    this._currentOutput.audio('-an');
+    this._currentOutput.audio("-an");
 
     return this;
   };
-
 
   /**
    * Specify audio codec
@@ -39,13 +34,11 @@ module.exports = function(proto: any) {
    * @param {String} codec audio codec name
    * @return FfmpegCommand
    */
-  proto.withAudioCodec =
-  proto.audioCodec = function(codec: any) {
-    this._currentOutput.audio('-acodec', codec);
+  proto.withAudioCodec = proto.audioCodec = function (codec: any) {
+    this._currentOutput.audio("-acodec", codec);
 
     return this;
   };
-
 
   /**
    * Specify audio bitrate
@@ -57,12 +50,10 @@ module.exports = function(proto: any) {
    * @param {String|Number} bitrate audio bitrate in kbps (with an optional 'k' suffix)
    * @return FfmpegCommand
    */
-  proto.withAudioBitrate =
-  proto.audioBitrate = function(bitrate: any) {
-    this._currentOutput.audio('-b:a', ('' + bitrate).replace(/k?$/, 'k'));
+  proto.withAudioBitrate = proto.audioBitrate = function (bitrate: any) {
+    this._currentOutput.audio("-b:a", ("" + bitrate).replace(/k?$/, "k"));
     return this;
   };
-
 
   /**
    * Specify audio channel count
@@ -74,12 +65,10 @@ module.exports = function(proto: any) {
    * @param {Number} channels channel count
    * @return FfmpegCommand
    */
-  proto.withAudioChannels =
-  proto.audioChannels = function(channels: any) {
-    this._currentOutput.audio('-ac', channels);
+  proto.withAudioChannels = proto.audioChannels = function (channels: any) {
+    this._currentOutput.audio("-ac", channels);
     return this;
   };
-
 
   /**
    * Specify audio frequency
@@ -91,12 +80,10 @@ module.exports = function(proto: any) {
    * @param {Number} freq audio frequency in Hz
    * @return FfmpegCommand
    */
-  proto.withAudioFrequency =
-  proto.audioFrequency = function(freq: any) {
-    this._currentOutput.audio('-ar', freq);
+  proto.withAudioFrequency = proto.audioFrequency = function (freq: any) {
+    this._currentOutput.audio("-ar", freq);
     return this;
   };
-
 
   /**
    * Specify audio quality
@@ -108,12 +95,10 @@ module.exports = function(proto: any) {
    * @param {Number} quality audio quality factor
    * @return FfmpegCommand
    */
-  proto.withAudioQuality =
-  proto.audioQuality = function(quality: any) {
-    this._currentOutput.audio('-aq', quality);
+  proto.withAudioQuality = proto.audioQuality = function (quality: any) {
+    this._currentOutput.audio("-aq", quality);
     return this;
   };
-
 
   /**
    * Specify custom audio filter(s)
@@ -163,18 +148,19 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withAudioFilter =
-  proto.withAudioFilters =
-  proto.audioFilter =
-  proto.audioFilters = function(filters: any) {
-    if (arguments.length > 1) {
-      filters = [].slice.call(arguments);
-    }
+    proto.withAudioFilters =
+    proto.audioFilter =
+    proto.audioFilters =
+      function (filters: any) {
+        if (arguments.length > 1) {
+          filters = [].slice.call(arguments);
+        }
 
-    if (!Array.isArray(filters)) {
-      filters = [filters];
-    }
+        if (!Array.isArray(filters)) {
+          filters = [filters];
+        }
 
-    this._currentOutput.audioFilters(utils.makeFilterStrings(filters));
-    return this;
-  };
+        this._currentOutput.audioFilters(utils.makeFilterStrings(filters));
+        return this;
+      };
 };

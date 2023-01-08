@@ -1,12 +1,14 @@
 /*jshint node:true, laxcomma:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var spawn = require('child_process').spawn;
+var spawn = require("child_process").spawn;
 
-
-function legacyTag(key: any) { return key.match(/^TAG:/); }
-function legacyDisposition(key: any) { return key.match(/^DISPOSITION:/); }
+function legacyTag(key: any) {
+  return key.match(/^TAG:/);
+}
+function legacyDisposition(key: any) {
+  return key.match(/^DISPOSITION:/);
+}
 
 function parseFfprobeOutput(out: any) {
   var lines = out.split(/\r\n|\r|\n/);
@@ -16,17 +18,17 @@ function parseFfprobeOutput(out: any) {
   });
 
   var data = {
-    streams: [],
+    streams: [] as any[],
     format: {},
-    chapters: []
+    chapters: [],
   };
 
   function parseBlock(name: any) {
-    var data = {};
+    var data: any = {};
 
     var line = lines.shift();
-    while (typeof line !== 'undefined') {
-      if (line.toLowerCase() == '[/'+name+']') {
+    while (typeof line !== "undefined") {
+      if (line.toLowerCase() == "[/" + name + "]") {
         return data;
       } else if (line.match(/^\[/)) {
         line = lines.shift();
@@ -35,11 +37,9 @@ function parseFfprobeOutput(out: any) {
 
       var kv = line.match(/^([^=]+)=(.*)$/);
       if (kv) {
-        if (!(kv[1].match(/^TAG:/)) && kv[2].match(/^[0-9]+(\.[0-9]+)?$/)) {
-          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+        if (!kv[1].match(/^TAG:/) && kv[2].match(/^[0-9]+(\.[0-9]+)?$/)) {
           data[kv[1]] = Number(kv[2]);
         } else {
-          // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           data[kv[1]] = kv[2];
         }
       }
@@ -51,17 +51,17 @@ function parseFfprobeOutput(out: any) {
   }
 
   var line = lines.shift();
-  while (typeof line !== 'undefined') {
+  while (typeof line !== "undefined") {
     if (line.match(/^\[stream/i)) {
-      var stream = parseBlock('stream');
-      // @ts-expect-error TS(2345): Argument of type '{}' is not assignable to paramet... Remove this comment to see the full error message
+      var stream = parseBlock("stream");
+
       data.streams.push(stream);
     } else if (line.match(/^\[chapter/i)) {
-      var chapter = parseBlock('chapter');
+      var chapter = parseBlock("chapter");
       // @ts-expect-error TS(2345): Argument of type '{}' is not assignable to paramet... Remove this comment to see the full error message
       data.chapters.push(chapter);
-    } else if (line.toLowerCase() === '[format]') {
-      data.format = parseBlock('format');
+    } else if (line.toLowerCase() === "[format]") {
+      data.format = parseBlock("format");
     }
 
     line = lines.shift();
@@ -70,10 +70,7 @@ function parseFfprobeOutput(out: any) {
   return data;
 }
 
-
-
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * A callback passed to the {@link FfmpegCommand#ffprobe} method.
    *
@@ -99,19 +96,22 @@ module.exports = function(proto: any) {
    * @param {FfmpegCommand~ffprobeCallback} callback callback function
    *
    */
-  proto.ffprobe = function() {
-    var input: any, index = null, options: any = [], callback: any;
+  proto.ffprobe = function () {
+    var input: any,
+      index = null,
+      options: any = [],
+      callback: any;
 
     // the last argument should be the callback
     var callback = arguments[arguments.length - 1];
 
-    var ended = false
+    var ended = false;
     function handleCallback(err: any, data: any) {
       if (!ended) {
         ended = true;
         callback(err, data);
       }
-    };
+    }
 
     // map the arguments to the correct variable names
     switch (arguments.length) {
@@ -120,7 +120,7 @@ module.exports = function(proto: any) {
         options = arguments[1];
         break;
       case 2:
-        if (typeof arguments[0] === 'number') {
+        if (typeof arguments[0] === "number") {
           index = arguments[0];
         } else if (Array.isArray(arguments[0])) {
           options = arguments[0];
@@ -128,11 +128,10 @@ module.exports = function(proto: any) {
         break;
     }
 
-
     if (index === null) {
       if (!this._currentInput) {
         // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-        return handleCallback(new Error('No input specified'));
+        return handleCallback(new Error("No input specified"));
       }
 
       input = this._currentInput;
@@ -141,49 +140,55 @@ module.exports = function(proto: any) {
 
       if (!input) {
         // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-        return handleCallback(new Error('Invalid input index'));
+        return handleCallback(new Error("Invalid input index"));
       }
     }
 
     // Find ffprobe
-    this._getFfprobePath(function(err: any, path: any) {
+    this._getFfprobePath(function (err: any, path: any) {
       if (err) {
         // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(err);
       } else if (!path) {
         // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-        return handleCallback(new Error('Cannot find ffprobe'));
+        return handleCallback(new Error("Cannot find ffprobe"));
       }
 
-      var stdout = '';
+      var stdout = "";
       var stdoutClosed = false;
-      var stderr = '';
+      var stderr = "";
       var stderrClosed = false;
 
       // Spawn ffprobe
-      var src = input.isStream ? 'pipe:0' : input.source;
-      var ffprobe = spawn(path, ['-show_streams', '-show_format'].concat(options, src), {windowsHide: true});
+      var src = input.isStream ? "pipe:0" : input.source;
+      var ffprobe = spawn(
+        path,
+        ["-show_streams", "-show_format"].concat(options, src),
+        { windowsHide: true }
+      );
 
       if (input.isStream) {
         // Skip errors on stdin. These get thrown when ffprobe is complete and
         // there seems to be no way hook in and close stdin before it throws.
-        ffprobe.stdin.on('error', function(err: any) {
-          if (['ECONNRESET', 'EPIPE', 'EOF'].indexOf(err.code) >= 0) { return; }
+        ffprobe.stdin.on("error", function (err: any) {
+          if (["ECONNRESET", "EPIPE", "EOF"].indexOf(err.code) >= 0) {
+            return;
+          }
           // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
           handleCallback(err);
         });
 
         // Once ffprobe's input stream closes, we need no more data from the
         // input
-        ffprobe.stdin.on('close', function() {
-            input.source.pause();
-            input.source.unpipe(ffprobe.stdin);
+        ffprobe.stdin.on("close", function () {
+          input.source.pause();
+          input.source.unpipe(ffprobe.stdin);
         });
 
         input.source.pipe(ffprobe.stdin);
       }
 
-      ffprobe.on('error', callback);
+      ffprobe.on("error", callback);
 
       // Ensure we wait for captured streams to end before calling callback
       var exitError: any = null;
@@ -195,7 +200,7 @@ module.exports = function(proto: any) {
         if (processExited && stdoutClosed && stderrClosed) {
           if (exitError) {
             if (stderr) {
-              exitError.message += '\n' + stderr;
+              exitError.message += "\n" + stderr;
             }
 
             // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
@@ -206,32 +211,30 @@ module.exports = function(proto: any) {
           var data = parseFfprobeOutput(stdout);
 
           // Handle legacy output with "TAG:x" and "DISPOSITION:x" keys
-          [data.format].concat(data.streams).forEach(function(target) {
+          [data.format].concat(data.streams).forEach(function (target: any) {
             if (target) {
               var legacyTagKeys = Object.keys(target).filter(legacyTag);
 
               if (legacyTagKeys.length) {
-                // @ts-expect-error TS(2339): Property 'tags' does not exist on type '{}'.
                 target.tags = target.tags || {};
 
-                legacyTagKeys.forEach(function(tagKey) {
-                  // @ts-expect-error TS(2339): Property 'tags' does not exist on type '{}'.
+                legacyTagKeys.forEach(function (tagKey) {
                   target.tags[tagKey.substr(4)] = target[tagKey];
-                  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+
                   delete target[tagKey];
                 });
               }
 
-              var legacyDispositionKeys = Object.keys(target).filter(legacyDisposition);
+              var legacyDispositionKeys =
+                Object.keys(target).filter(legacyDisposition);
 
               if (legacyDispositionKeys.length) {
-                // @ts-expect-error TS(2339): Property 'disposition' does not exist on type '{}'... Remove this comment to see the full error message
                 target.disposition = target.disposition || {};
 
-                legacyDispositionKeys.forEach(function(dispositionKey) {
-                  // @ts-expect-error TS(2339): Property 'disposition' does not exist on type '{}'... Remove this comment to see the full error message
-                  target.disposition[dispositionKey.substr(12)] = target[dispositionKey];
-                  // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+                legacyDispositionKeys.forEach(function (dispositionKey) {
+                  target.disposition[dispositionKey.substr(12)] =
+                    target[dispositionKey];
+
                   delete target[dispositionKey];
                 });
               }
@@ -244,13 +247,13 @@ module.exports = function(proto: any) {
 
       // Handle ffprobe exit
       var processExited = false;
-      ffprobe.on('exit', function(code: any, signal: any) {
+      ffprobe.on("exit", function (code: any, signal: any) {
         processExited = true;
 
         if (code) {
-          handleExit(new Error('ffprobe exited with code ' + code));
+          handleExit(new Error("ffprobe exited with code " + code));
         } else if (signal) {
-          handleExit(new Error('ffprobe was killed with signal ' + signal));
+          handleExit(new Error("ffprobe was killed with signal " + signal));
         } else {
           // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           handleExit();
@@ -258,21 +261,21 @@ module.exports = function(proto: any) {
       });
 
       // Handle stdout/stderr streams
-      ffprobe.stdout.on('data', function(data: any) {
+      ffprobe.stdout.on("data", function (data: any) {
         stdout += data;
       });
 
-      ffprobe.stdout.on('close', function() {
+      ffprobe.stdout.on("close", function () {
         stdoutClosed = true;
         // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
 
-      ffprobe.stderr.on('data', function(data: any) {
+      ffprobe.stderr.on("data", function (data: any) {
         stderr += data;
       });
 
-      ffprobe.stderr.on('close', function() {
+      ffprobe.stderr.on("close", function () {
         stderrClosed = true;
         // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();

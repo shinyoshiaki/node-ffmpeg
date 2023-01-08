@@ -1,16 +1,13 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var utils = require('../utils');
-
+var utils = require("../utils");
 
 /*
  *! Output-related methods
  */
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * Add output
    *
@@ -22,49 +19,57 @@ module.exports = function(proto: any) {
    * @param {Object} [pipeopts={}] pipe options (only applies to streams)
    * @return FfmpegCommand
    */
-  proto.addOutput =
-  proto.output = function(target: any, pipeopts: any) {
+  proto.addOutput = proto.output = function (target: any, pipeopts: any) {
     var isFile = false;
 
     if (!target && this._currentOutput) {
       // No target is only allowed when called from constructor
-      throw new Error('Invalid output');
+      throw new Error("Invalid output");
     }
 
-    if (target && typeof target !== 'string') {
-      if (!('writable' in target) || !(target.writable)) {
-        throw new Error('Invalid output');
+    if (target && typeof target !== "string") {
+      if (!("writable" in target) || !target.writable) {
+        throw new Error("Invalid output");
       }
-    } else if (typeof target === 'string') {
+    } else if (typeof target === "string") {
       var protocol = target.match(/^([a-z]{2,}):/i);
-      isFile = !protocol || protocol[0] === 'file';
+      isFile = !protocol || protocol[0] === "file";
     }
 
-    if (target && !('target' in this._currentOutput)) {
+    if (target && !("target" in this._currentOutput)) {
       // For backwards compatibility, set target for first output
       this._currentOutput.target = target;
       this._currentOutput.isFile = isFile;
       this._currentOutput.pipeopts = pipeopts || {};
     } else {
-      if (target && typeof target !== 'string') {
-        var hasOutputStream = this._outputs.some(function(output: any) {
-          return typeof output.target !== 'string';
+      if (target && typeof target !== "string") {
+        var hasOutputStream = this._outputs.some(function (output: any) {
+          return typeof output.target !== "string";
         });
 
         if (hasOutputStream) {
-          throw new Error('Only one output stream is supported');
+          throw new Error("Only one output stream is supported");
         }
       }
 
-      this._outputs.push(this._currentOutput = {
-        target: target,
-        isFile: isFile,
-        flags: {},
-        pipeopts: pipeopts || {}
-      });
+      this._outputs.push(
+        (this._currentOutput = {
+          target: target,
+          isFile: isFile,
+          flags: {},
+          pipeopts: pipeopts || {},
+        })
+      );
 
       var self = this;
-      ['audio', 'audioFilters', 'video', 'videoFilters', 'sizeFilters', 'options'].forEach(function(key) {
+      [
+        "audio",
+        "audioFilters",
+        "video",
+        "videoFilters",
+        "sizeFilters",
+        "options",
+      ].forEach(function (key) {
         self._currentOutput[key] = utils.args();
       });
 
@@ -77,7 +82,6 @@ module.exports = function(proto: any) {
     return this;
   };
 
-
   /**
    * Specify output seek time
    *
@@ -88,12 +92,10 @@ module.exports = function(proto: any) {
    * @param {String|Number} seek seek time in seconds or as a '[hh:[mm:]]ss[.xxx]' string
    * @return FfmpegCommand
    */
-  proto.seekOutput =
-  proto.seek = function(seek: any) {
-    this._currentOutput.options('-ss', seek);
+  proto.seekOutput = proto.seek = function (seek: any) {
+    this._currentOutput.options("-ss", seek);
     return this;
   };
-
 
   /**
    * Set output duration
@@ -106,12 +108,12 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withDuration =
-  proto.setDuration =
-  proto.duration = function(duration: any) {
-    this._currentOutput.options('-t', duration);
-    return this;
-  };
-
+    proto.setDuration =
+    proto.duration =
+      function (duration: any) {
+        this._currentOutput.options("-t", duration);
+        return this;
+      };
 
   /**
    * Set output format
@@ -124,13 +126,13 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.toFormat =
-  proto.withOutputFormat =
-  proto.outputFormat =
-  proto.format = function(format: any) {
-    this._currentOutput.options('-f', format);
-    return this;
-  };
-
+    proto.withOutputFormat =
+    proto.outputFormat =
+    proto.format =
+      function (format: any) {
+        this._currentOutput.options("-f", format);
+        return this;
+      };
 
   /**
    * Add stream mapping to output
@@ -141,11 +143,13 @@ module.exports = function(proto: any) {
    * @param {String} spec stream specification string, with optional square brackets
    * @return FfmpegCommand
    */
-  proto.map = function(spec: any) {
-    this._currentOutput.options('-map', spec.replace(utils.streamRegexp, '[$1]'));
+  proto.map = function (spec: any) {
+    this._currentOutput.options(
+      "-map",
+      spec.replace(utils.streamRegexp, "[$1]")
+    );
     return this;
   };
-
 
   /**
    * Run flvtool2/flvmeta on output
@@ -156,8 +160,7 @@ module.exports = function(proto: any) {
    *
    * @return FfmpegCommand
    */
-  proto.updateFlvMetadata =
-  proto.flvmeta = function() {
+  proto.updateFlvMetadata = proto.flvmeta = function () {
     this._currentOutput.flags.flvmeta = true;
     return this;
   };

@@ -1,15 +1,13 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var utils = require('../utils');
+var utils = require("../utils");
 
 /*
  *! Input-related methods
  */
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * Add an input to command
    *
@@ -26,41 +24,43 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.mergeAdd =
-  proto.addInput =
-  proto.input = function(source: any) {
-    var isFile = false;
-    var isStream = false;
+    proto.addInput =
+    proto.input =
+      function (source: any) {
+        var isFile = false;
+        var isStream = false;
 
-    if (typeof source !== 'string') {
-      if (!('readable' in source) || !(source.readable)) {
-        throw new Error('Invalid input');
-      }
+        if (typeof source !== "string") {
+          if (!("readable" in source) || !source.readable) {
+            throw new Error("Invalid input");
+          }
 
-      var hasInputStream = this._inputs.some(function(input: any) {
-        return input.isStream;
-      });
+          var hasInputStream = this._inputs.some(function (input: any) {
+            return input.isStream;
+          });
 
-      if (hasInputStream) {
-        throw new Error('Only one input stream is supported');
-      }
+          if (hasInputStream) {
+            throw new Error("Only one input stream is supported");
+          }
 
-      isStream = true;
-      source.pause();
-    } else {
-      var protocol = source.match(/^([a-z]{2,}):/i);
-      isFile = !protocol || protocol[0] === 'file';
-    }
+          isStream = true;
+          source.pause();
+        } else {
+          var protocol = source.match(/^([a-z]{2,}):/i);
+          isFile = !protocol || protocol[0] === "file";
+        }
 
-    this._inputs.push(this._currentInput = {
-      source: source,
-      isFile: isFile,
-      isStream: isStream,
-      options: utils.args()
-    });
+        this._inputs.push(
+          (this._currentInput = {
+            source: source,
+            isFile: isFile,
+            isStream: isStream,
+            options: utils.args(),
+          })
+        );
 
-    return this;
-  };
-
+        return this;
+      };
 
   /**
    * Specify input format for the last specified input
@@ -73,16 +73,16 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withInputFormat =
-  proto.inputFormat =
-  proto.fromFormat = function(format: any) {
-    if (!this._currentInput) {
-      throw new Error('No input specified');
-    }
+    proto.inputFormat =
+    proto.fromFormat =
+      function (format: any) {
+        if (!this._currentInput) {
+          throw new Error("No input specified");
+        }
 
-    this._currentInput.options('-f', format);
-    return this;
-  };
-
+        this._currentInput.options("-f", format);
+        return this;
+      };
 
   /**
    * Specify input FPS for the last specified input
@@ -96,21 +96,21 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withInputFps =
-  proto.withInputFPS =
-  proto.withFpsInput =
-  proto.withFPSInput =
-  proto.inputFPS =
-  proto.inputFps =
-  proto.fpsInput =
-  proto.FPSInput = function(fps: any) {
-    if (!this._currentInput) {
-      throw new Error('No input specified');
-    }
+    proto.withInputFPS =
+    proto.withFpsInput =
+    proto.withFPSInput =
+    proto.inputFPS =
+    proto.inputFps =
+    proto.fpsInput =
+    proto.FPSInput =
+      function (fps: any) {
+        if (!this._currentInput) {
+          throw new Error("No input specified");
+        }
 
-    this._currentInput.options('-r', fps);
-    return this;
-  };
-
+        this._currentInput.options("-r", fps);
+        return this;
+      };
 
   /**
    * Use native framerate for the last specified input
@@ -122,16 +122,16 @@ module.exports = function(proto: any) {
    * @return FfmmegCommand
    */
   proto.nativeFramerate =
-  proto.withNativeFramerate =
-  proto.native = function() {
-    if (!this._currentInput) {
-      throw new Error('No input specified');
-    }
+    proto.withNativeFramerate =
+    proto.native =
+      function () {
+        if (!this._currentInput) {
+          throw new Error("No input specified");
+        }
 
-    this._currentInput.options('-re');
-    return this;
-  };
-
+        this._currentInput.options("-re");
+        return this;
+      };
 
   /**
    * Specify input seek time for the last specified input
@@ -143,17 +143,15 @@ module.exports = function(proto: any) {
    * @param {String|Number} seek seek time in seconds or as a '[hh:[mm:]]ss[.xxx]' string
    * @return FfmpegCommand
    */
-  proto.setStartTime =
-  proto.seekInput = function(seek: any) {
+  proto.setStartTime = proto.seekInput = function (seek: any) {
     if (!this._currentInput) {
-      throw new Error('No input specified');
+      throw new Error("No input specified");
     }
 
-    this._currentInput.options('-ss', seek);
+    this._currentInput.options("-ss", seek);
 
     return this;
   };
-
 
   /**
    * Loop over the last specified input
@@ -164,14 +162,14 @@ module.exports = function(proto: any) {
    * @param {String|Number} [duration] loop duration in seconds or as a '[[hh:]mm:]ss[.xxx]' string
    * @return FfmpegCommand
    */
-  proto.loop = function(duration: any) {
+  proto.loop = function (duration: any) {
     if (!this._currentInput) {
-      throw new Error('No input specified');
+      throw new Error("No input specified");
     }
 
-    this._currentInput.options('-loop', '1');
+    this._currentInput.options("-loop", "1");
 
-    if (typeof duration !== 'undefined') {
+    if (typeof duration !== "undefined") {
       this.duration(duration);
     }
 

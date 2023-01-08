@@ -1,17 +1,22 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var path = require('path');
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var util = require('util');
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var EventEmitter = require('events').EventEmitter;
+var path = require("path");
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var utils = require('./utils');
-var ARGLISTS = ['_global', '_audio', '_audioFilters', '_video', '_videoFilters', '_sizeFilters', '_complexFilters'];
+var util = require("util");
 
+var EventEmitter = require("events").EventEmitter;
+
+var utils = require("./utils");
+var ARGLISTS = [
+  "_global",
+  "_audio",
+  "_audioFilters",
+  "_video",
+  "_videoFilters",
+  "_sizeFilters",
+  "_complexFilters",
+];
 
 /**
  * Create an ffmpeg command
@@ -41,7 +46,7 @@ function FfmpegCommand(this: any, input: any, options: any) {
 
   EventEmitter.call(this);
 
-  if (typeof input === 'object' && !('readable' in input)) {
+  if (typeof input === "object" && !("readable" in input)) {
     // Options object passed directly
     options = input;
   } else {
@@ -66,15 +71,16 @@ function FfmpegCommand(this: any, input: any, options: any) {
 
   // Create argument lists
   var self = this;
-  ['_global', '_complexFilters'].forEach(function(prop) {
+  ["_global", "_complexFilters"].forEach(function (prop) {
     // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     self[prop] = utils.args();
   });
 
   // Set default option values
-  options.stdoutLines = 'stdoutLines' in options ? options.stdoutLines : 100;
-  // @ts-expect-error TS(2304): Cannot find name '__dirname'.
-  options.presets = options.presets || options.preset || path.join(__dirname, 'presets');
+  options.stdoutLines = "stdoutLines" in options ? options.stdoutLines : 100;
+
+  options.presets =
+    options.presets || options.preset || path.join(__dirname, "presets");
   options.niceness = options.niceness || options.priority || 0;
 
   // Save options
@@ -84,16 +90,15 @@ function FfmpegCommand(this: any, input: any, options: any) {
   // Setup logger
   // @ts-expect-error TS(2339): Property 'logger' does not exist on type '{}'.
   this.logger = options.logger || {
-    debug: function() {},
-    info: function() {},
-    warn: function() {},
-    error: function() {}
+    debug: function () {},
+    info: function () {},
+    warn: function () {},
+    error: function () {},
   };
 }
 util.inherits(FfmpegCommand, EventEmitter);
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = FfmpegCommand;
 
+module.exports = FfmpegCommand;
 
 /**
  * Clone an ffmpeg command
@@ -123,7 +128,7 @@ module.exports = FfmpegCommand;
  * @method FfmpegCommand#clone
  * @return FfmpegCommand
  */
-FfmpegCommand.prototype.clone = function() {
+FfmpegCommand.prototype.clone = function () {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
   var clone = new FfmpegCommand();
   var self = this;
@@ -133,27 +138,34 @@ FfmpegCommand.prototype.clone = function() {
   clone.logger = this.logger;
 
   // Clone inputs
-  clone._inputs = this._inputs.map(function(input: any) {
+  clone._inputs = this._inputs.map(function (input: any) {
     return {
       source: input.source,
-      options: input.options.clone()
+      options: input.options.clone(),
     };
   });
 
   // Create first output
-  if ('target' in this._outputs[0]) {
+  if ("target" in this._outputs[0]) {
     // We have outputs set, don't clone them and create first output
     clone._outputs = [];
     clone.output();
   } else {
     // No outputs set, clone first output options
     clone._outputs = [
-      clone._currentOutput = {
-        flags: {}
-      }
+      (clone._currentOutput = {
+        flags: {},
+      }),
     ];
 
-    ['audio', 'audioFilters', 'video', 'videoFilters', 'sizeFilters', 'options'].forEach(function(key) {
+    [
+      "audio",
+      "audioFilters",
+      "video",
+      "videoFilters",
+      "sizeFilters",
+      "options",
+    ].forEach(function (key) {
       clone._currentOutput[key] = self._currentOutput[key].clone();
     });
 
@@ -166,89 +178,84 @@ FfmpegCommand.prototype.clone = function() {
   }
 
   // Clone argument lists
-  ['_global', '_complexFilters'].forEach(function(prop) {
+  ["_global", "_complexFilters"].forEach(function (prop) {
     clone[prop] = self[prop].clone();
   });
 
   return clone;
 };
 
-
 /* Add methods from options submodules */
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/inputs')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/audio')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/video')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/videosize')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/output')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/custom')(FfmpegCommand.prototype);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./options/misc')(FfmpegCommand.prototype);
+require("./options/inputs")(FfmpegCommand.prototype);
 
+require("./options/audio")(FfmpegCommand.prototype);
+
+require("./options/video")(FfmpegCommand.prototype);
+
+require("./options/videosize")(FfmpegCommand.prototype);
+
+require("./options/output")(FfmpegCommand.prototype);
+
+require("./options/custom")(FfmpegCommand.prototype);
+
+require("./options/misc")(FfmpegCommand.prototype);
 
 /* Add processor methods */
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./processor')(FfmpegCommand.prototype);
-
+require("./processor")(FfmpegCommand.prototype);
 
 /* Add capabilities methods */
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./capabilities')(FfmpegCommand.prototype);
+require("./capabilities")(FfmpegCommand.prototype);
 
-FfmpegCommand.setFfmpegPath = function(path: any) {
+FfmpegCommand.setFfmpegPath = function (path: any) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).setFfmpegPath(path);
+  new FfmpegCommand().setFfmpegPath(path);
 };
 
-FfmpegCommand.setFfprobePath = function(path: any) {
+FfmpegCommand.setFfprobePath = function (path: any) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).setFfprobePath(path);
+  new FfmpegCommand().setFfprobePath(path);
 };
 
-FfmpegCommand.setFlvtoolPath = function(path: any) {
+FfmpegCommand.setFlvtoolPath = function (path: any) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).setFlvtoolPath(path);
+  new FfmpegCommand().setFlvtoolPath(path);
 };
 
-FfmpegCommand.availableFilters =
-FfmpegCommand.getAvailableFilters = function(callback: any) {
+FfmpegCommand.availableFilters = FfmpegCommand.getAvailableFilters = function (
+  callback: any
+) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).availableFilters(callback);
+  new FfmpegCommand().availableFilters(callback);
 };
 
-FfmpegCommand.availableCodecs =
-FfmpegCommand.getAvailableCodecs = function(callback: any) {
+FfmpegCommand.availableCodecs = FfmpegCommand.getAvailableCodecs = function (
+  callback: any
+) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).availableCodecs(callback);
+  new FfmpegCommand().availableCodecs(callback);
 };
 
-FfmpegCommand.availableFormats =
-FfmpegCommand.getAvailableFormats = function(callback: any) {
+FfmpegCommand.availableFormats = FfmpegCommand.getAvailableFormats = function (
+  callback: any
+) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).availableFormats(callback);
+  new FfmpegCommand().availableFormats(callback);
 };
 
-FfmpegCommand.availableEncoders =
-FfmpegCommand.getAvailableEncoders = function(callback: any) {
-  // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
-  (new FfmpegCommand()).availableEncoders(callback);
-};
-
+FfmpegCommand.availableEncoders = FfmpegCommand.getAvailableEncoders =
+  function (callback: any) {
+    // @ts-expect-error TS(2554): Expected 2 arguments, but got 0.
+    new FfmpegCommand().availableEncoders(callback);
+  };
 
 /* Add ffprobe methods */
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./ffprobe')(FfmpegCommand.prototype);
+require("./ffprobe")(FfmpegCommand.prototype);
 
-FfmpegCommand.ffprobe = function(file: any) {
+FfmpegCommand.ffprobe = function (file: any) {
   // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
   var instance = new FfmpegCommand(file);
   instance.ffprobe.apply(instance, Array.prototype.slice.call(arguments, 1));
@@ -256,5 +263,4 @@ FfmpegCommand.ffprobe = function(file: any) {
 
 /* Add processing recipes */
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require('./recipes')(FfmpegCommand.prototype);
+require("./recipes")(FfmpegCommand.prototype);

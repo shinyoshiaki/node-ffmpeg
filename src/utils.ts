@@ -1,12 +1,13 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var exec = require('child_process').exec;
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var isWindows = require('os').platform().match(/win(32|64)/);
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var which = require('which');
+var exec = require("child_process").exec;
+
+var isWindows = require("os")
+  .platform()
+  .match(/win(32|64)/);
+
+var which = require("which");
 
 var nlRegexp = /\r\n|\r|\n/g;
 var streamRegexp = /^\[?(.*?)\]?$/;
@@ -21,35 +22,31 @@ var whichCache = {};
  * @private
  */
 function parseProgressLine(line: any) {
-  var progress = {};
+  var progress: any = {};
 
   // Remove all spaces after = and trim
-  line  = line.replace(/=\s+/g, '=').trim();
-  var progressParts = line.split(' ');
+  line = line.replace(/=\s+/g, "=").trim();
+  var progressParts = line.split(" ");
 
   // Split every progress part by "=" to get key and value
-  for(var i = 0; i < progressParts.length; i++) {
-    var progressSplit = progressParts[i].split('=', 2);
+  for (var i = 0; i < progressParts.length; i++) {
+    var progressSplit = progressParts[i].split("=", 2);
     var key = progressSplit[0];
     var value = progressSplit[1];
 
     // This is not a progress line
-    if(typeof value === 'undefined')
-      return null;
+    if (typeof value === "undefined") return null;
 
-    // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     progress[key] = value;
   }
 
   return progress;
 }
 
-
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-var utils = module.exports = {
+//@ts-ignore
+var utils = (module.exports = {
   isWindows: isWindows,
   streamRegexp: streamRegexp,
-
 
   /**
    * Copy an object keys into another one
@@ -58,12 +55,11 @@ var utils = module.exports = {
    * @param {Object} dest destination object
    * @private
    */
-  copy: function(source: any, dest: any) {
-    Object.keys(source).forEach(function(key) {
+  copy: function (source: any, dest: any) {
+    Object.keys(source).forEach(function (key) {
       dest[key] = source[key];
     });
   },
-
 
   /**
    * Create an argument list
@@ -77,11 +73,11 @@ var utils = module.exports = {
    *
    * @private
    */
-  args: function() {
+  args: function () {
     var list: any = [];
 
     // Append argument(s) to the list
-    var argfunc = function() {
+    var argfunc = function () {
       if (arguments.length === 1 && Array.isArray(arguments[0])) {
         list = list.concat(arguments[0]);
       } else {
@@ -91,19 +87,19 @@ var utils = module.exports = {
 
     // Clear argument list
     // @ts-expect-error TS(2339): Property 'clear' does not exist on type '() => voi... Remove this comment to see the full error message
-    argfunc.clear = function() {
+    argfunc.clear = function () {
       list = [];
     };
 
     // Return argument list
     // @ts-expect-error TS(2339): Property 'get' does not exist on type '() => void'... Remove this comment to see the full error message
-    argfunc.get = function() {
+    argfunc.get = function () {
       return list;
     };
 
     // Find argument 'arg' in list, and if found, return an array of the 'count' items that follow it
     // @ts-expect-error TS(2339): Property 'find' does not exist on type '() => void... Remove this comment to see the full error message
-    argfunc.find = function(arg: any, count: any) {
+    argfunc.find = function (arg: any, count: any) {
       var index = list.indexOf(arg);
       if (index !== -1) {
         return list.slice(index + 1, index + 1 + (count || 0));
@@ -112,7 +108,7 @@ var utils = module.exports = {
 
     // Find argument 'arg' in list, and if found, remove it as well as the 'count' items that follow it
     // @ts-expect-error TS(2339): Property 'remove' does not exist on type '() => vo... Remove this comment to see the full error message
-    argfunc.remove = function(arg: any, count: any) {
+    argfunc.remove = function (arg: any, count: any) {
       var index = list.indexOf(arg);
       if (index !== -1) {
         list.splice(index, (count || 0) + 1);
@@ -121,7 +117,7 @@ var utils = module.exports = {
 
     // Clone argument list
     // @ts-expect-error TS(2339): Property 'clone' does not exist on type '() => voi... Remove this comment to see the full error message
-    argfunc.clone = function() {
+    argfunc.clone = function () {
       var cloned = utils.args();
       cloned(list);
       return cloned;
@@ -129,7 +125,6 @@ var utils = module.exports = {
 
     return argfunc;
   },
-
 
   /**
    * Generate filter strings
@@ -145,13 +140,13 @@ var utils = module.exports = {
    * @return String[]
    * @private
    */
-  makeFilterStrings: function(filters: any) {
-    return filters.map(function(filterSpec: any) {
-      if (typeof filterSpec === 'string') {
+  makeFilterStrings: function (filters: any) {
+    return filters.map(function (filterSpec: any) {
+      if (typeof filterSpec === "string") {
         return filterSpec;
       }
 
-      var filterString = '';
+      var filterString = "";
 
       // Filter string format is:
       // [input1][input2]...filter[output1][output2]...
@@ -161,11 +156,13 @@ var utils = module.exports = {
 
       // Add inputs
       if (Array.isArray(filterSpec.inputs)) {
-        filterString += filterSpec.inputs.map(function(streamSpec: any) {
-          return streamSpec.replace(streamRegexp, '[$1]');
-        }).join('');
-      } else if (typeof filterSpec.inputs === 'string') {
-        filterString += filterSpec.inputs.replace(streamRegexp, '[$1]');
+        filterString += filterSpec.inputs
+          .map(function (streamSpec: any) {
+            return streamSpec.replace(streamRegexp, "[$1]");
+          })
+          .join("");
+      } else if (typeof filterSpec.inputs === "string") {
+        filterString += filterSpec.inputs.replace(streamRegexp, "[$1]");
       }
 
       // Add filter
@@ -173,45 +170,63 @@ var utils = module.exports = {
 
       // Add options
       if (filterSpec.options) {
-        if (typeof filterSpec.options === 'string' || typeof filterSpec.options === 'number') {
+        if (
+          typeof filterSpec.options === "string" ||
+          typeof filterSpec.options === "number"
+        ) {
           // Option string
-          filterString += '=' + filterSpec.options;
+          filterString += "=" + filterSpec.options;
         } else if (Array.isArray(filterSpec.options)) {
           // Option array (unnamed options)
-          filterString += '=' + filterSpec.options.map(function(option: any) {
-            if (typeof option === 'string' && option.match(filterEscapeRegexp)) {
-              return '\'' + option + '\'';
-            } else {
-              return option;
-            }
-          }).join(':');
+          filterString +=
+            "=" +
+            filterSpec.options
+              .map(function (option: any) {
+                if (
+                  typeof option === "string" &&
+                  option.match(filterEscapeRegexp)
+                ) {
+                  return "'" + option + "'";
+                } else {
+                  return option;
+                }
+              })
+              .join(":");
         } else if (Object.keys(filterSpec.options).length) {
           // Option object (named options)
-          filterString += '=' + Object.keys(filterSpec.options).map(function(option) {
-            var value = filterSpec.options[option];
+          filterString +=
+            "=" +
+            Object.keys(filterSpec.options)
+              .map(function (option) {
+                var value = filterSpec.options[option];
 
-            if (typeof value === 'string' && value.match(filterEscapeRegexp)) {
-              value = '\'' + value + '\'';
-            }
+                if (
+                  typeof value === "string" &&
+                  value.match(filterEscapeRegexp)
+                ) {
+                  value = "'" + value + "'";
+                }
 
-            return option + '=' + value;
-          }).join(':');
+                return option + "=" + value;
+              })
+              .join(":");
         }
       }
 
       // Add outputs
       if (Array.isArray(filterSpec.outputs)) {
-        filterString += filterSpec.outputs.map(function(streamSpec: any) {
-          return streamSpec.replace(streamRegexp, '[$1]');
-        }).join('');
-      } else if (typeof filterSpec.outputs === 'string') {
-        filterString += filterSpec.outputs.replace(streamRegexp, '[$1]');
+        filterString += filterSpec.outputs
+          .map(function (streamSpec: any) {
+            return streamSpec.replace(streamRegexp, "[$1]");
+          })
+          .join("");
+      } else if (typeof filterSpec.outputs === "string") {
+        filterString += filterSpec.outputs.replace(streamRegexp, "[$1]");
       }
 
       return filterString;
     });
   },
-
 
   /**
    * Search for an executable
@@ -222,23 +237,22 @@ var utils = module.exports = {
    * @param {Function} callback callback with signature (err, path)
    * @private
    */
-  which: function(name: any, callback: any) {
+  which: function (name: any, callback: any) {
     if (name in whichCache) {
       // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       return callback(null, whichCache[name]);
     }
 
-    which(name, function(err: any, result: any){
+    which(name, function (err: any, result: any) {
       if (err) {
         // Treat errors as not found
         // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-        return callback(null, whichCache[name] = '');
+        return callback(null, (whichCache[name] = ""));
       }
       // @ts-expect-error TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-      callback(null, whichCache[name] = result);
+      callback(null, (whichCache[name] = result));
     });
   },
-
 
   /**
    * Convert a [[hh:]mm:]ss[.xxx] timemark into seconds
@@ -247,16 +261,16 @@ var utils = module.exports = {
    * @return Number
    * @private
    */
-  timemarkToSeconds: function(timemark: any) {
-    if (typeof timemark === 'number') {
+  timemarkToSeconds: function (timemark: any) {
+    if (typeof timemark === "number") {
       return timemark;
     }
 
-    if (timemark.indexOf(':') === -1 && timemark.indexOf('.') >= 0) {
+    if (timemark.indexOf(":") === -1 && timemark.indexOf(".") >= 0) {
       return Number(timemark);
     }
 
-    var parts = timemark.split(':');
+    var parts = timemark.split(":");
 
     // add seconds
     var secs = Number(parts.pop());
@@ -274,7 +288,6 @@ var utils = module.exports = {
     return secs;
   },
 
-
   /**
    * Extract codec data from ffmpeg stderr and emit 'codecData' event if appropriate
    * Call it with an initially empty codec object once with each line of stderr output until it returns true
@@ -285,13 +298,17 @@ var utils = module.exports = {
    * @return {Boolean} true if codec data is complete (and event was emitted), false otherwise
    * @private
    */
-  extractCodecData: function(command: any, stderrLine: any, codecsObject: any) {
+  extractCodecData: function (
+    command: any,
+    stderrLine: any,
+    codecsObject: any
+  ) {
     var inputPattern = /Input #[0-9]+, ([^ ]+),/;
     var durPattern = /Duration\: ([^,]+)/;
     var audioPattern = /Audio\: (.*)/;
     var videoPattern = /Video\: (.*)/;
 
-    if (!('inputStack' in codecsObject)) {
+    if (!("inputStack" in codecsObject)) {
       codecsObject.inputStack = [];
       codecsObject.inputIndex = -1;
       codecsObject.inInput = false;
@@ -303,31 +320,37 @@ var utils = module.exports = {
 
     var format, dur, audio, video;
 
-    if (format = stderrLine.match(inputPattern)) {
+    if ((format = stderrLine.match(inputPattern))) {
       inInput = codecsObject.inInput = true;
       inputIndex = codecsObject.inputIndex = codecsObject.inputIndex + 1;
 
-      inputStack[inputIndex] = { format: format[1], audio: '', video: '', duration: '' };
+      inputStack[inputIndex] = {
+        format: format[1],
+        audio: "",
+        video: "",
+        duration: "",
+      };
     } else if (inInput && (dur = stderrLine.match(durPattern))) {
       inputStack[inputIndex].duration = dur[1];
     } else if (inInput && (audio = stderrLine.match(audioPattern))) {
-      audio = audio[1].split(', ');
+      audio = audio[1].split(", ");
       inputStack[inputIndex].audio = audio[0];
       inputStack[inputIndex].audio_details = audio;
     } else if (inInput && (video = stderrLine.match(videoPattern))) {
-      video = video[1].split(', ');
+      video = video[1].split(", ");
       inputStack[inputIndex].video = video[0];
       inputStack[inputIndex].video_details = video;
     } else if (/Output #\d+/.test(stderrLine)) {
       inInput = codecsObject.inInput = false;
-    } else if (/Stream mapping:|Press (\[q\]|ctrl-c) to stop/.test(stderrLine)) {
-      command.emit.apply(command, ['codecData'].concat(inputStack));
+    } else if (
+      /Stream mapping:|Press (\[q\]|ctrl-c) to stop/.test(stderrLine)
+    ) {
+      command.emit.apply(command, ["codecData"].concat(inputStack));
       return true;
     }
 
     return false;
   },
-
 
   /**
    * Extract progress data from ffmpeg stderr and emit 'progress' event if appropriate
@@ -336,35 +359,40 @@ var utils = module.exports = {
    * @param {String} stderrLine ffmpeg stderr data
    * @private
    */
-  extractProgress: function(command: any, stderrLine: any) {
+  extractProgress: function (command: any, stderrLine: any) {
     var progress = parseProgressLine(stderrLine);
 
     if (progress) {
       // build progress report object
       var ret = {
-        // @ts-expect-error TS(2339): Property 'frame' does not exist on type '{}'.
         frames: parseInt(progress.frame, 10),
-        // @ts-expect-error TS(2339): Property 'fps' does not exist on type '{}'.
+
         currentFps: parseInt(progress.fps, 10),
-        // @ts-expect-error TS(2339): Property 'bitrate' does not exist on type '{}'.
-        currentKbps: progress.bitrate ? parseFloat(progress.bitrate.replace('kbits/s', '')) : 0,
-        // @ts-expect-error TS(2339): Property 'size' does not exist on type '{}'.
+
+        currentKbps: progress.bitrate
+          ? parseFloat(progress.bitrate.replace("kbits/s", ""))
+          : 0,
+
         targetSize: parseInt(progress.size || progress.Lsize, 10),
-        // @ts-expect-error TS(2339): Property 'time' does not exist on type '{}'.
-        timemark: progress.time
+
+        timemark: progress.time,
       };
 
       // calculate percent progress using duration
-      if (command._ffprobeData && command._ffprobeData.format && command._ffprobeData.format.duration) {
+      if (
+        command._ffprobeData &&
+        command._ffprobeData.format &&
+        command._ffprobeData.format.duration
+      ) {
         var duration = Number(command._ffprobeData.format.duration);
         if (!isNaN(duration))
           // @ts-expect-error TS(2339): Property 'percent' does not exist on type '{ frame... Remove this comment to see the full error message
-          ret.percent = (utils.timemarkToSeconds(ret.timemark) / duration) * 100;
+          ret.percent =
+            (utils.timemarkToSeconds(ret.timemark) / duration) * 100;
       }
-      command.emit('progress', ret);
+      command.emit("progress", ret);
     }
   },
-
 
   /**
    * Extract error message(s) from ffmpeg stderr
@@ -373,18 +401,20 @@ var utils = module.exports = {
    * @return {String}
    * @private
    */
-  extractError: function(stderr: any) {
+  extractError: function (stderr: any) {
     // Only return the last stderr lines that don't start with a space or a square bracket
-    return stderr.split(nlRegexp).reduce(function(messages: any, message: any) {
-      if (message.charAt(0) === ' ' || message.charAt(0) === '[') {
-        return [];
-      } else {
-        messages.push(message);
-        return messages;
-      }
-    }, []).join('\n');
+    return stderr
+      .split(nlRegexp)
+      .reduce(function (messages: any, message: any) {
+        if (message.charAt(0) === " " || message.charAt(0) === "[") {
+          return [];
+        } else {
+          messages.push(message);
+          return messages;
+        }
+      }, [])
+      .join("\n");
   },
-
 
   /**
    * Creates a line ring buffer object with the following methods:
@@ -395,29 +425,33 @@ var utils = module.exports = {
    *
    * @param {Numebr} maxLines maximum number of lines to store (<= 0 for unlimited)
    */
-  linesRing: function(maxLines: any) {
+  linesRing: function (maxLines: any) {
     var cbs: any = [];
     var lines: any = [];
     var current: any = null;
-    var closed = false
+    var closed = false;
     var max = maxLines - 1;
 
     function emit(line: any) {
       // @ts-expect-error TS(7006): Parameter 'cb' implicitly has an 'any' type.
-      cbs.forEach(function(cb) { cb(line); });
+      cbs.forEach(function (cb) {
+        cb(line);
+      });
     }
 
     return {
-      callback: function(cb: any) {
+      callback: function (cb: any) {
         // @ts-expect-error TS(7006): Parameter 'l' implicitly has an 'any' type.
-        lines.forEach(function(l) { cb(l); });
+        lines.forEach(function (l) {
+          cb(l);
+        });
         cbs.push(cb);
       },
 
-      append: function(str: any) {
+      append: function (str: any) {
         if (closed) return;
-        // @ts-expect-error TS(2580): Cannot find name 'Buffer'. Do you need to install ... Remove this comment to see the full error message
-        if (str instanceof Buffer) str = '' + str;
+
+        if (str instanceof Buffer) str = "" + str;
         if (!str || str.length === 0) return;
 
         var newLines = str.split(nlRegexp);
@@ -437,7 +471,7 @@ var utils = module.exports = {
 
           current = newLines.pop();
 
-          newLines.forEach(function(l: any) {
+          newLines.forEach(function (l: any) {
             emit(l);
             lines.push(l);
           });
@@ -448,15 +482,15 @@ var utils = module.exports = {
         }
       },
 
-      get: function() {
+      get: function () {
         if (current !== null) {
-          return lines.concat([current]).join('\n');
+          return lines.concat([current]).join("\n");
         } else {
-          return lines.join('\n');
+          return lines.join("\n");
         }
       },
 
-      close: function() {
+      close: function () {
         if (closed) return;
 
         if (current !== null) {
@@ -471,7 +505,7 @@ var utils = module.exports = {
         }
 
         closed = true;
-      }
+      },
     };
-  }
-};
+  },
+});

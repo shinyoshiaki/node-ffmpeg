@@ -1,16 +1,13 @@
 /*jshint node:true*/
-'use strict';
+"use strict";
 
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var utils = require('../utils');
-
+var utils = require("../utils");
 
 /*
  *! Video-related methods
  */
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(proto: any) {
+module.exports = function (proto: any) {
   /**
    * Disable video in the output
    *
@@ -20,15 +17,13 @@ module.exports = function(proto: any) {
    *
    * @return FfmpegCommand
    */
-  proto.withNoVideo =
-  proto.noVideo = function() {
+  proto.withNoVideo = proto.noVideo = function () {
     this._currentOutput.video.clear();
     this._currentOutput.videoFilters.clear();
-    this._currentOutput.video('-vn');
+    this._currentOutput.video("-vn");
 
     return this;
   };
-
 
   /**
    * Specify video codec
@@ -40,12 +35,10 @@ module.exports = function(proto: any) {
    * @param {String} codec video codec name
    * @return FfmpegCommand
    */
-  proto.withVideoCodec =
-  proto.videoCodec = function(codec: any) {
-    this._currentOutput.video('-vcodec', codec);
+  proto.withVideoCodec = proto.videoCodec = function (codec: any) {
+    this._currentOutput.video("-vcodec", codec);
     return this;
   };
-
 
   /**
    * Specify video bitrate
@@ -58,22 +51,26 @@ module.exports = function(proto: any) {
    * @param {Boolean} [constant=false] enforce constant bitrate
    * @return FfmpegCommand
    */
-  proto.withVideoBitrate =
-  proto.videoBitrate = function(bitrate: any, constant: any) {
-    bitrate = ('' + bitrate).replace(/k?$/, 'k');
+  proto.withVideoBitrate = proto.videoBitrate = function (
+    bitrate: any,
+    constant: any
+  ) {
+    bitrate = ("" + bitrate).replace(/k?$/, "k");
 
-    this._currentOutput.video('-b:v', bitrate);
+    this._currentOutput.video("-b:v", bitrate);
     if (constant) {
       this._currentOutput.video(
-        '-maxrate', bitrate,
-        '-minrate', bitrate,
-        '-bufsize', '3M'
+        "-maxrate",
+        bitrate,
+        "-minrate",
+        bitrate,
+        "-bufsize",
+        "3M"
       );
     }
 
     return this;
   };
-
 
   /**
    * Specify custom video filter(s)
@@ -123,22 +120,22 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withVideoFilter =
-  proto.withVideoFilters =
-  proto.videoFilter =
-  proto.videoFilters = function(filters: any) {
-    if (arguments.length > 1) {
-      filters = [].slice.call(arguments);
-    }
+    proto.withVideoFilters =
+    proto.videoFilter =
+    proto.videoFilters =
+      function (filters: any) {
+        if (arguments.length > 1) {
+          filters = [].slice.call(arguments);
+        }
 
-    if (!Array.isArray(filters)) {
-      filters = [filters];
-    }
+        if (!Array.isArray(filters)) {
+          filters = [filters];
+        }
 
-    this._currentOutput.videoFilters(utils.makeFilterStrings(filters));
+        this._currentOutput.videoFilters(utils.makeFilterStrings(filters));
 
-    return this;
-  };
-
+        return this;
+      };
 
   /**
    * Specify output FPS
@@ -151,21 +148,21 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.withOutputFps =
-  proto.withOutputFPS =
-  proto.withFpsOutput =
-  proto.withFPSOutput =
-  proto.withFps =
-  proto.withFPS =
-  proto.outputFPS =
-  proto.outputFps =
-  proto.fpsOutput =
-  proto.FPSOutput =
-  proto.fps =
-  proto.FPS = function(fps: any) {
-    this._currentOutput.video('-r', fps);
-    return this;
-  };
-
+    proto.withOutputFPS =
+    proto.withFpsOutput =
+    proto.withFPSOutput =
+    proto.withFps =
+    proto.withFPS =
+    proto.outputFPS =
+    proto.outputFps =
+    proto.fpsOutput =
+    proto.FPSOutput =
+    proto.fps =
+    proto.FPS =
+      function (fps: any) {
+        this._currentOutput.video("-r", fps);
+        return this;
+      };
 
   /**
    * Only transcode a certain number of frames
@@ -178,9 +175,10 @@ module.exports = function(proto: any) {
    * @return FfmpegCommand
    */
   proto.takeFrames =
-  proto.withFrames =
-  proto.frames = function(frames: any) {
-    this._currentOutput.video('-vframes', frames);
-    return this;
-  };
+    proto.withFrames =
+    proto.frames =
+      function (frames: any) {
+        this._currentOutput.video("-vframes", frames);
+        return this;
+      };
 };
