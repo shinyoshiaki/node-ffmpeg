@@ -143,17 +143,19 @@ export const audioQuality = (self: FfmpegCommand) => (quality: any) => {
  * @param {String|String[]|Object} [filters.options] filter option string, array, or object
  * @return FfmpegCommand
  */
-export const audioFilters = (self: FfmpegCommand) => (filters: any) => {
-  //@ts-ignore
-  if (arguments.length > 1) {
-    //@ts-ignore
-    filters = [].slice.call(arguments);
-  }
+export const audioFilters =
+  (self: FfmpegCommand) =>
+  (...argument: any[]) => {
+    let [filters] = argument;
 
-  if (!Array.isArray(filters)) {
-    filters = [filters];
-  }
+    if (argument.length > 1) {
+      filters = [].slice.call(argument);
+    }
 
-  self._currentOutput.audioFilters(utils.makeFilterStrings(filters));
-  return self;
-};
+    if (!Array.isArray(filters)) {
+      filters = [filters];
+    }
+
+    self._currentOutput.audioFilters(utils.makeFilterStrings(filters));
+    return self;
+  };

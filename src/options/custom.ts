@@ -32,39 +32,41 @@ import utils from "../utils";
  * @param {...String} options option string(s) or string array
  * @return FfmpegCommand
  */
-export const inputOptions = (self: FfmpegCommand) => (options: any) => {
-  if (!self._currentInput) {
-    throw new Error("No input specified");
-  }
+export const inputOptions =
+  (self: FfmpegCommand) =>
+  (...argument: any[]) => {
+    let [options] = argument;
 
-  let doSplit = true;
-
-  //@ts-ignore
-  if (arguments.length > 1) {
-    //@ts-ignore
-    options = [].slice.call(arguments);
-    doSplit = false;
-  }
-
-  if (!Array.isArray(options)) {
-    options = [options];
-  }
-
-  const formattedOption = options.reduce((options: any, option: any) => {
-    const split = String(option).split(" ");
-
-    if (doSplit && split.length === 2) {
-      options.push(split[0], split[1]);
-    } else {
-      options.push(option);
+    if (!self._currentInput) {
+      throw new Error("No input specified");
     }
 
-    return options;
-  }, []);
+    let doSplit = true;
 
-  self._currentInput.options(formattedOption);
-  return self;
-};
+    if (argument.length > 1) {
+      options = [].slice.call(argument);
+      doSplit = false;
+    }
+
+    if (!Array.isArray(options)) {
+      options = [options];
+    }
+
+    const formattedOption = options.reduce((options: any, option: any) => {
+      const split = String(option).split(" ");
+
+      if (doSplit && split.length === 2) {
+        options.push(split[0], split[1]);
+      } else {
+        options.push(option);
+      }
+
+      return options;
+    }, []);
+
+    self._currentInput.options(formattedOption);
+    return self;
+  };
 
 /**
  * Add custom output option(s)

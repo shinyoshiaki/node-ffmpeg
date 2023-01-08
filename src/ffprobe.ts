@@ -99,17 +99,16 @@ function parseFfprobeOutput(out: any) {
  */
 export const ffprobe =
   (self: FfmpegCommand) =>
-  (...args: any[]) => {
+  (...argument: any[]) => {
     let input: any,
-      index = null,
+      index: number | null = null,
       options: any = [];
 
     // the last argument should be the callback
-    //@ts-ignore
-    const callback = arguments[arguments.length - 1];
+    const callback = argument[argument.length - 1];
 
     let ended = false;
-    function handleCallback(err: any, data: any) {
+    function handleCallback(err: any, data?: any) {
       if (!ended) {
         ended = true;
         callback(err, data);
@@ -117,30 +116,22 @@ export const ffprobe =
     }
 
     // map the arguments to the correct variable names
-    //@ts-ignore
-    switch (arguments.length) {
+    switch (argument.length) {
       case 3:
-        //@ts-ignore
-        index = arguments[0];
-        //@ts-ignore
-        options = arguments[1];
+        index = argument[0];
+        options = argument[1];
         break;
       case 2:
-        //@ts-ignore
-        if (typeof arguments[0] === "number") {
-          //@ts-ignore
-          index = arguments[0];
-          //@ts-ignore
-        } else if (Array.isArray(arguments[0])) {
-          //@ts-ignore
-          options = arguments[0];
+        if (typeof argument[0] === "number") {
+          index = argument[0];
+        } else if (Array.isArray(argument[0])) {
+          options = argument[0];
         }
         break;
     }
 
     if (index === null) {
       if (!self._currentInput) {
-        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error("No input specified"));
       }
 
@@ -149,7 +140,6 @@ export const ffprobe =
       input = self._inputs[index];
 
       if (!input) {
-        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error("Invalid input index"));
       }
     }
@@ -157,10 +147,8 @@ export const ffprobe =
     // Find ffprobe
     self._getFfprobePath(function (err: any, path: any) {
       if (err) {
-        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(err);
       } else if (!path) {
-        // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
         return handleCallback(new Error("Cannot find ffprobe"));
       }
 
@@ -184,7 +172,7 @@ export const ffprobe =
           if (["ECONNRESET", "EPIPE", "EOF"].indexOf(err.code) >= 0) {
             return;
           }
-          // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
+
           handleCallback(err);
         });
 
@@ -202,7 +190,7 @@ export const ffprobe =
 
       // Ensure we wait for captured streams to end before calling callback
       let exitError: any = null;
-      function handleExit(err: any) {
+      function handleExit(err?: any) {
         if (err) {
           exitError = err;
         }
@@ -213,7 +201,6 @@ export const ffprobe =
               exitError.message += "\n" + stderr;
             }
 
-            // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
             return handleCallback(exitError);
           }
 
@@ -269,7 +256,6 @@ export const ffprobe =
         } else if (signal) {
           handleExit(new Error("ffprobe was killed with signal " + signal));
         } else {
-          // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
           handleExit();
         }
       });
@@ -281,7 +267,6 @@ export const ffprobe =
 
       ffprobe.stdout.on("close", function () {
         stdoutClosed = true;
-        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
 
@@ -291,7 +276,6 @@ export const ffprobe =
 
       ffprobe.stderr.on("close", function () {
         stderrClosed = true;
-        // @ts-expect-error TS(2554): Expected 1 arguments, but got 0.
         handleExit();
       });
     });

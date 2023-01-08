@@ -496,9 +496,10 @@ export class FfmpegCommand extends EventEmitter {
 
   static availableEncoders = this.getAvailableEncoders;
 
-  static ffprobe = function (file: any) {
+  static ffprobe = function (...argument: any[]) {
+    const [file] = argument;
     const instance = new FfmpegCommand(file);
-    instance.ffprobe.apply(instance, Array.prototype.slice.call(arguments, 1));
+    instance.ffprobe.apply(instance, Array.prototype.slice.call(argument, 1));
   };
 }
 

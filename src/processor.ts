@@ -434,7 +434,7 @@ export const run = (self: FfmpegCommand) => () => {
 
   // Ensure we send 'end' or 'error' only once
   let ended = false;
-  function emitEnd(err: any, stdout: any, stderr: any) {
+  function emitEnd(err: any, stdout?: any, stderr?: any) {
     if (!ended) {
       ended = true;
 
@@ -448,7 +448,6 @@ export const run = (self: FfmpegCommand) => () => {
 
   self._prepare(function (err: any, args: any) {
     if (err) {
-      // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
       return emitEnd(err);
     }
 
@@ -474,7 +473,7 @@ export const run = (self: FfmpegCommand) => () => {
             );
             // @ts-expect-error TS(2339): Property 'inputStreamError' does not exist on type... Remove this comment to see the full error message
             reportingErr.inputStreamError = err;
-            // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
+
             emitEnd(reportingErr);
             ffmpegProc.kill();
           });
@@ -513,7 +512,6 @@ export const run = (self: FfmpegCommand) => () => {
             // under load, the process 'exit' event sometimes happens
             // after the output stream 'close' event.
             setTimeout(function () {
-              // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
               emitEnd(new Error("Output stream closed"));
               ffmpegProc.kill();
             }, 20);
@@ -579,7 +577,6 @@ export const run = (self: FfmpegCommand) => () => {
           if (flvmeta.length) {
             self._getFlvtoolPath((err: any, flvtool: any) => {
               if (err) {
-                // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
                 return emitEnd(err);
               }
 
@@ -621,7 +618,6 @@ export const run = (self: FfmpegCommand) => () => {
                 },
                 function (err: any) {
                   if (err) {
-                    // @ts-expect-error TS(2554): Expected 3 arguments, but got 1.
                     emitEnd(err);
                   } else {
                     emitEnd(null, stdoutRing.get(), stderrRing.get());

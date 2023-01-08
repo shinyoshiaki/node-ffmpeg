@@ -117,21 +117,23 @@ export const videoBitrate =
  * @param {String|String[]|Object} [filters.options] filter option string, array, or object
  * @return FfmpegCommand
  */
-export const videoFilters = (self: FfmpegCommand) => (filters: any) => {
-  //@ts-ignore
-  if (arguments.length > 1) {
-    //@ts-ignore
-    filters = [].slice.call(arguments);
-  }
+export const videoFilters =
+  (self: FfmpegCommand) =>
+  (...argument: any[]) => {
+    let [filters] = argument;
 
-  if (!Array.isArray(filters)) {
-    filters = [filters];
-  }
+    if (argument.length > 1) {
+      filters = [].slice.call(argument);
+    }
 
-  self._currentOutput.videoFilters(utils.makeFilterStrings(filters));
+    if (!Array.isArray(filters)) {
+      filters = [filters];
+    }
 
-  return self;
-};
+    self._currentOutput.videoFilters(utils.makeFilterStrings(filters));
+
+    return self;
+  };
 
 /**
  * Specify output FPS
