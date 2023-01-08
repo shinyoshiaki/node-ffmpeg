@@ -53,14 +53,13 @@ export const output =
         }
       }
 
-      self._outputs.push(
-        (self._currentOutput = {
-          target: target,
-          isFile: isFile,
-          flags: {},
-          pipeopts: pipeopts || {},
-        })
-      );
+      const output = {
+        target: target,
+        isFile: isFile,
+        flags: {},
+        pipeopts: pipeopts || {},
+      };
+      self._outputs.push((self._currentOutput = output));
 
       [
         "audio",

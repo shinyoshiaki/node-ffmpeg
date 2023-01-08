@@ -239,27 +239,21 @@ export const _getArguments = (self: FfmpegCommand) => () => {
     return output.isFile;
   });
 
-  return [].concat(
-    // Inputs and input options
-    self._inputs.reduce(function (args: any, input: any) {
-      const source = typeof input.source === "string" ? input.source : "pipe:0";
+  // Inputs and input options
+  const inputsAndInputOptions = self._inputs.reduce((args: any, input) => {
+    const source = typeof input.source === "string" ? input.source : "pipe:0";
 
-      // For each input, add input options, then '-i <source>'
-      return args.concat(input.options.get(), ["-i", source]);
-    }, []),
+    // For each input, add input options, then '-i <source>'
+    const inputOptions = input.options.get();
+    return args.concat(inputOptions, ["-i", source]);
+  }, []);
 
-    // Global options
-    self._global.get(),
+  // Global options
+  const globalOptions = self._global.get();
 
-    // Overwrite if we have file outputs
-    // @ts-expect-error TS(2769): No overload matches this call.
-    fileOutput ? ["-y"] : [],
-
-    // Complex filters
-    complexFilters,
-
-    // Outputs, filters and output options
-    self._outputs.reduce(function (args: any, output: any) {
+  // Outputs, filters and output options
+  const OutputsAndFiltersAndOutputOptions = self._outputs.reduce(
+    (args: any[], output) => {
       const sizeFilters = utils.makeFilterStrings(output.sizeFilters.get());
       const audioFilters = output.audioFilters.get();
       const videoFilters = output.videoFilters.get().concat(sizeFilters);
@@ -273,16 +267,34 @@ export const _getArguments = (self: FfmpegCommand) => () => {
         outputArg = ["pipe:1"];
       }
 
-      return args.concat(
-        output.audio.get(),
+      const outputAudio = output.audio.get();
+      const outputVideo = output.video.get();
+      const outputOptions = output.options.get();
+
+      const res = args.concat(
+        outputAudio,
         audioFilters.length ? ["-filter:a", audioFilters.join(",")] : [],
-        output.video.get(),
+        outputVideo,
         videoFilters.length ? ["-filter:v", videoFilters.join(",")] : [],
-        output.options.get(),
+        outputOptions,
         outputArg
       );
-    }, [])
+      return res;
+    },
+    []
   );
+
+  const args = [].concat(
+    inputsAndInputOptions,
+    globalOptions,
+    // Overwrite if we have file outputs
+    // @ts-expect-error TS(2769): No overload matches this call.
+    fileOutput ? ["-y"] : [],
+    // Complex filters
+    complexFilters,
+    OutputsAndFiltersAndOutputOptions
+  );
+  return args;
 };
 
 /**

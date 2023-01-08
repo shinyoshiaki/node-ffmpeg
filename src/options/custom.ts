@@ -50,19 +50,19 @@ export const inputOptions = (self: FfmpegCommand) => (options: any) => {
     options = [options];
   }
 
-  self._currentInput.options(
-    options.reduce(function (options: any, option: any) {
-      const split = String(option).split(" ");
+  const formattedOption = options.reduce((options: any, option: any) => {
+    const split = String(option).split(" ");
 
-      if (doSplit && split.length === 2) {
-        options.push(split[0], split[1]);
-      } else {
-        options.push(option);
-      }
+    if (doSplit && split.length === 2) {
+      options.push(split[0], split[1]);
+    } else {
+      options.push(option);
+    }
 
-      return options;
-    }, [])
-  );
+    return options;
+  }, []);
+
+  self._currentInput.options(formattedOption);
   return self;
 };
 
@@ -85,22 +85,24 @@ export const inputOptions = (self: FfmpegCommand) => (options: any) => {
  * @param {...String} options option string(s) or string array
  * @return FfmpegCommand
  */
-export const outputOptions = (self: FfmpegCommand) => (options: any) => {
-  let doSplit = true;
+export const outputOptions =
+  (self: FfmpegCommand) =>
+  (...args: any[]) => {
+    let options = args[0];
+    let doSplit = true;
 
-  //@ts-ignore
-  if (arguments.length > 1) {
     //@ts-ignore
-    options = [].slice.call(arguments);
-    doSplit = false;
-  }
+    if (args.length > 1) {
+      //@ts-ignore
+      options = [].slice.call(args);
+      doSplit = false;
+    }
 
-  if (!Array.isArray(options)) {
-    options = [options];
-  }
+    if (!Array.isArray(options)) {
+      options = [options];
+    }
 
-  self._currentOutput.options(
-    options.reduce(function (options: any, option: any) {
+    const formattedOption = options.reduce((options: any, option: any) => {
       const split = String(option).split(" ");
 
       if (doSplit && split.length === 2) {
@@ -110,10 +112,11 @@ export const outputOptions = (self: FfmpegCommand) => (options: any) => {
       }
 
       return options;
-    }, [])
-  );
-  return self;
-};
+    }, []);
+
+    self._currentOutput.options(formattedOption);
+    return self;
+  };
 
 /**
  * Specify a complex filtergraph

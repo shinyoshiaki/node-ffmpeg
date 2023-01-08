@@ -43,14 +43,13 @@ export const mergeAdd = (self: FfmpegCommand) => (source: any) => {
     isFile = !protocol || protocol[0] === "file";
   }
 
-  self._inputs.push(
-    (self._currentInput = {
-      source: source,
-      isFile: isFile,
-      isStream: isStream,
-      options: utils.args(),
-    })
-  );
+  const input = {
+    source: source,
+    isFile: isFile,
+    isStream: isStream,
+    options: utils.args(),
+  };
+  self._inputs.push((self._currentInput = input));
 
   return self;
 };

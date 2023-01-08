@@ -5,3 +5,4 @@ lib-cov
 .idea
 *.iml
 lib
+output.mp4

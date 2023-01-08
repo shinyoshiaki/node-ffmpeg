@@ -47,16 +47,17 @@ function copy(source: any, dest: any) {
   });
 }
 
-function args() {
+export function args() {
   let list: any = [];
 
   // Append argument(s) to the list
-  const argfunc = function () {
-    if (arguments.length === 1 && Array.isArray(arguments[0])) {
-      list = list.concat(arguments[0]);
+  const argfunc = (...argument: any[]) => {
+    if (argument.length === 1 && Array.isArray(argument[0])) {
+      list = list.concat(argument[0]);
     } else {
-      list = list.concat([].slice.call(arguments));
+      list = list.concat([].slice.call(argument));
     }
+    list;
   };
 
   // Clear argument list
@@ -87,6 +88,7 @@ function args() {
 
   // Clone argument list
   argfunc.clone = () => {
+    //@ts-ignore
     const cloned = args();
     //@ts-ignore
     cloned(list);

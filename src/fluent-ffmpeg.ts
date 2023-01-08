@@ -69,11 +69,32 @@ export const ARGLISTS = [
   "_complexFilters",
 ];
 
+export interface Input {
+  source: any;
+  isFile?: boolean;
+  isStream?: boolean;
+  options: any;
+}
+
+export interface Output {
+  target?: any;
+  isFile?: boolean;
+  flags: any;
+  pipeopts?: any;
+  sizeData?: any;
+  audioFilters?: any;
+  videoFilters?: any;
+  sizeFilters?: any;
+  audio?: any;
+  video?: any;
+  options?: any;
+}
+
 export class FfmpegCommand extends EventEmitter {
-  _inputs: any[];
-  _currentInput: any;
-  _outputs: any[];
-  _currentOutput: any;
+  _inputs: Input[];
+  _currentInput!: Input;
+  _outputs: Output[];
+  _currentOutput!: Output;
   options: any;
   logger: any;
   // Create argument lists
@@ -215,15 +236,15 @@ export class FfmpegCommand extends EventEmitter {
   inputOptions = this.addInputOption;
 
   addOutputOption = outputOptions(this);
-  addOutputOptions = this.addInputOption;
-  addOption = this.addInputOption;
-  addOptions = this.addInputOption;
-  withOutputOption = this.addInputOption;
-  withOutputOptions = this.addInputOption;
-  withOption = this.addInputOption;
-  withOptions = this.addInputOption;
-  outputOption = this.addInputOption;
-  outputOptions = this.addInputOption;
+  addOutputOptions = this.addOutputOption;
+  addOption = this.addOutputOption;
+  addOptions = this.addOutputOption;
+  withOutputOption = this.addOutputOption;
+  withOutputOptions = this.addOutputOption;
+  withOption = this.addOutputOption;
+  withOptions = this.addOutputOption;
+  outputOption = this.addOutputOption;
+  outputOptions = this.addOutputOption;
 
   filterGraph = complexFilter(this);
   complexFilter = this.filterGraph;
