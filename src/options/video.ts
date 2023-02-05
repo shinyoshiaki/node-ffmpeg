@@ -25,20 +25,22 @@ export const noVideo = (self: FfmpegCommand) => () => {
   return self;
 };
 
-/**
- * Specify video codec
- *
- * @method FfmpegCommand#videoCodec
- * @category Video
- * @aliases withVideoCodec
- *
- * @param {String} codec video codec name
- * @return FfmpegCommand
- */
-export const videoCodec = (self: FfmpegCommand) => (codec: any) => {
-  self._currentOutput.video("-vcodec", codec);
-  return self;
-};
+export const videoCodec =
+  (self: FfmpegCommand) =>
+  /**
+   * Specify video codec
+   *
+   * @method FfmpegCommand#videoCodec
+   * @category Video
+   * @aliases withVideoCodec
+   *
+   * @param {String} codec video codec name
+   * @return FfmpegCommand
+   */
+  (codec: any) => {
+    self._currentOutput.video("-vcodec", codec);
+    return self;
+  };
 
 /**
  * Specify video bitrate

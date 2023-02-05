@@ -14,7 +14,14 @@ const pathToSourceFile = path.resolve(
 const readStream = fs.createReadStream(pathToSourceFile);
 const writeStream = fs.createWriteStream("./output.mp4");
 
-new ffmpeg(readStream)
+new ffmpeg(readStream, {
+  logger: {
+    debug: console.log,
+    info: console.log,
+    warn: console.warn,
+    error: console.error,
+  },
+})
   .addOutputOptions(
     "-movflags +frag_keyframe+separate_moof+omit_tfhd_offset+empty_moov"
   )

@@ -4,6 +4,7 @@
 import { ChildProcessWithoutNullStreams } from "child_process";
 import { EventEmitter } from "events";
 import path from "path";
+import { Stream } from "stream";
 
 import {
   _checkCapabilities,
@@ -45,6 +46,7 @@ import {
   frames,
   noVideo,
   videoBitrate,
+  videoCodec,
   videoFilters,
 } from "./options/video";
 import { aspectRatio, autopad, keepDAR, size } from "./options/videosize";
@@ -68,6 +70,21 @@ export const ARGLISTS = [
   "_sizeFilters",
   "_complexFilters",
 ];
+
+export interface Options {
+  source?: any;
+  stdoutLines?: any;
+  presets?: any;
+  preset?: any;
+  niceness?: any;
+  priority?: any;
+  logger?: {
+    debug: (...args: any[]) => void;
+    info: (...args: any[]) => void;
+    warn: (...args: any[]) => void;
+    error: (...args: any[]) => void;
+  };
+}
 
 export interface Input {
   source: any;
@@ -156,7 +173,7 @@ export class FfmpegCommand extends EventEmitter {
 
   withNoVideo = noVideo(this);
   noVideo = this.withNoVideo;
-
+  videoCodec = videoCodec(this);
   withVideoBitrate = videoBitrate(this);
   videoBitrate = this.withVideoBitrate;
 
@@ -330,18 +347,22 @@ export class FfmpegCommand extends EventEmitter {
    * @param {Number} [options.timeout=<no timeout>] ffmpeg processing timeout in seconds
    * @param {String|ReadableStream} [options.source=<no input>] alias for the `input` parameter
    */
-  constructor(input?: any, options?: any) {
+  constructor(input?: string | Stream | Options, options?: Options) {
     super();
 
     EventEmitter.call(this);
 
     if (typeof input === "object" && !("readable" in input)) {
       // Options object passed directly
-      options = input;
+      options = input as Options;
     } else {
       // Input passed first
       options = options || {};
       options.source = input;
+    }
+
+    if (options === undefined) {
+      throw new Error("options is undefined");
     }
 
     // Add input if present
@@ -504,3 +525,6 @@ export class FfmpegCommand extends EventEmitter {
 }
 
 export default { FfmpegCommand };
+
+export const ffmpeg = (...args: ConstructorParameters<typeof FfmpegCommand>) =>
+  new FfmpegCommand(...args);

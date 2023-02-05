@@ -152,7 +152,7 @@ export const _spawnFfmpeg =
 
       const stderrRing = utils.linesRing(maxLines);
       let stderrClosed = false;
-
+      self.logger.info(command, args, options);
       // Spawn process
       const ffmpegProc = spawn(command, args, options);
 
@@ -699,21 +699,23 @@ export const renice = (self: FfmpegCommand) => (niceness: any) => {
   return self;
 };
 
-/**
- * Kill current ffmpeg process, if any
- *
- * @method FfmpegCommand#kill
- * @category Processing
- *
- * @param {String} [signal=SIGKILL] signal name
- * @return FfmpegCommand
- */
-export const kill = (self: FfmpegCommand) => (signal: any) => {
-  if (!self.ffmpegProc) {
-    self.logger.warn("No running ffmpeg process, cannot send signal");
-  } else {
-    self.ffmpegProc.kill(signal || "SIGKILL");
-  }
+export const kill =
+  (self: FfmpegCommand) =>
+  /**
+   * Kill current ffmpeg process, if any
+   *
+   * @method FfmpegCommand#kill
+   * @category Processing
+   *
+   * @param {String} [signal=SIGKILL] signal name
+   * @return FfmpegCommand
+   */
+  (signal?: any) => {
+    if (!self.ffmpegProc) {
+      self.logger.warn("No running ffmpeg process, cannot send signal");
+    } else {
+      self.ffmpegProc.kill(signal || "SIGKILL");
+    }
 
-  return self;
-};
+    return self;
+  };

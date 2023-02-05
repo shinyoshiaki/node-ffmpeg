@@ -73,25 +73,27 @@ export const withInputFormat = (self: FfmpegCommand) => (format: any) => {
   return self;
 };
 
-/**
- * Specify input FPS for the last specified input
- * (only valid for raw video formats)
- *
- * @method FfmpegCommand#inputFps
- * @category Input
- * @aliases withInputFps,withInputFPS,withFpsInput,withFPSInput,inputFPS,inputFps,fpsInput
- *
- * @param {Number} fps input FPS
- * @return FfmpegCommand
- */
-export const withInputFps = (self: FfmpegCommand) => (fps: any) => {
-  if (!self._currentInput) {
-    throw new Error("No input specified");
-  }
+export const withInputFps =
+  (self: FfmpegCommand) =>
+  /**
+   * Specify input FPS for the last specified input
+   * (only valid for raw video formats)
+   *
+   * @method FfmpegCommand#inputFps
+   * @category Input
+   * @aliases withInputFps,withInputFPS,withFpsInput,withFPSInput,inputFPS,inputFps,fpsInput
+   *
+   * @param {Number} fps input FPS
+   * @return FfmpegCommand
+   */
+  (fps: number) => {
+    if (!self._currentInput) {
+      throw new Error("No input specified");
+    }
 
-  self._currentInput.options("-r", fps);
-  return self;
-};
+    self._currentInput.options("-r", fps);
+    return self;
+  };
 
 /**
  * Use native framerate for the last specified input

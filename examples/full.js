@@ -1,33 +1,33 @@
-var ffmpeg = require('../index');
+let ffmpeg = require("../index");
 
 // make sure you set the correct path to your video file
-var proc = ffmpeg('/path/to/your_movie.avi')
+let proc = ffmpeg("/path/to/your_movie.avi")
   // set video bitrate
   .videoBitrate(1024)
   // set target codec
-  .videoCodec('divx')
+  .videoCodec("divx")
   // set aspect ratio
-  .aspect('16:9')
+  .aspect("16:9")
   // set size in percent
-  .size('50%')
+  .size("50%")
   // set fps
   .fps(24)
   // set audio bitrate
-  .audioBitrate('128k')
+  .audioBitrate("128k")
   // set audio codec
-  .audioCodec('libmp3lame')
+  .audioCodec("libmp3lame")
   // set number of audio channels
   .audioChannels(2)
   // set custom option
-  .addOption('-vtag', 'DIVX')
+  .addOption("-vtag", "DIVX")
   // set output format to force
-  .format('avi')
+  .format("avi")
   // setup event handlers
-  .on('end', function() {
-    console.log('file has been converted succesfully');
+  .on("end", function () {
+    console.log("file has been converted succesfully");
   })
-  .on('error', function(err) {
-    console.log('an error happened: ' + err.message);
+  .on("error", function (err) {
+    console.log("an error happened: " + err.message);
   })
   // save to file
-  .save('/path/to/your_target.avi');
+  .save("/path/to/your_target.avi");

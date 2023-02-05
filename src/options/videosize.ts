@@ -189,32 +189,34 @@ export const keepDAR = (self: FfmpegCommand) => () => {
   ]);
 };
 
-/**
- * Set output size
- *
- * The 'size' parameter can have one of 4 forms:
- * - 'X%': rescale to xx % of the original size
- * - 'WxH': specify width and height
- * - 'Wx?': specify width and compute height from input aspect ratio
- * - '?xH': specify height and compute width from input aspect ratio
- *
- * Note: both dimensions will be truncated to multiples of 2.
- *
- * @method FfmpegCommand#size
- * @category Video size
- * @aliases withSize,setSize
- *
- * @param {String} size size string, eg. '33%', '320x240', '320x?', '?x240'
- * @return FfmpegCommand
- */
-export const size = (self: FfmpegCommand) => (size: any) => {
-  const filters = createSizeFilters(self._currentOutput, "size", size);
+export const size =
+  (self: FfmpegCommand) =>
+  /**
+   * Set output size
+   *
+   * The 'size' parameter can have one of 4 forms:
+   * - 'X%': rescale to xx % of the original size
+   * - 'WxH': specify width and height
+   * - 'Wx?': specify width and compute height from input aspect ratio
+   * - '?xH': specify height and compute width from input aspect ratio
+   *
+   * Note: both dimensions will be truncated to multiples of 2.
+   *
+   * @method FfmpegCommand#size
+   * @category Video size
+   * @aliases withSize,setSize
+   *
+   * @param {String} size size string, eg. '33%', '320x240', '320x?', '?x240'
+   * @return FfmpegCommand
+   */
+  (size: any) => {
+    const filters = createSizeFilters(self._currentOutput, "size", size);
 
-  self._currentOutput.sizeFilters.clear();
-  self._currentOutput.sizeFilters(filters);
+    self._currentOutput.sizeFilters.clear();
+    self._currentOutput.sizeFilters(filters);
 
-  return self;
-};
+    return self;
+  };
 
 /**
  * Set output aspect ratio
