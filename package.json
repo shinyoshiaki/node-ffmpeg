@@ -1,6 +1,6 @@
 {
   "name": "node-ffmpeg-childprocess",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A fluent API to FFMPEG (http://www.ffmpeg.org)",
   "keywords": [
     "ffmpeg"
@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "deploy": "npm run build && npm publish",
     "lint": "eslint ./src --fix",
     "test": "make test",
     "type": "tsc --noEmit"
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/async": "^3.2.16",
+    "@types/fluent-ffmpeg": "^2.1.20",
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
@@ -34,6 +36,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "jsdoc": "latest",
     "mocha": "latest",
     "should": "latest",

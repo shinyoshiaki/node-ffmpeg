@@ -152,7 +152,7 @@ export const _spawnFfmpeg =
 
       const stderrRing = utils.linesRing(maxLines);
       let stderrClosed = false;
-      self.logger.info(command, args, options);
+      self.logger.info(command, args, options, command + " " + args.join(" "));
       // Spawn process
       const ffmpegProc = spawn(command, args, options);
 
